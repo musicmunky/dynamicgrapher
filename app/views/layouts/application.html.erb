@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+
+	<%= render partial: "shared/headtag" %>
+
+<body>
+	<%= render partial: "shared/navbar" %>
+	<div id="mainwrapper" class="container" style="margin-bottom:125px;">
+		<%= yield %>
+		<%#= yield :main %>
+	</div>
+	<%= render partial: "shared/footer" %>
+</body>
+</html>
+
+

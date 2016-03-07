@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+
+	<%= render partial: "shared/headtag" %>
+
+	<body>
+		<%= render partial: "shared/navbar" %>
+		<div id="wrapper" style="margin-top:60px;margin-bottom:-60px;">
+
+			<%= yield :grapher %>
+
+			<div id="graph_wrapper">
+				<canvas id="graph">Sorry, your browser does not support this application. The following browsers are supported:<br /><br />
+				<a href="http://www.google.com/chrome/">Google Chrome</a><br /><a href="http://www.mozilla.com/firefox/">Mozilla Firefox</a><br />
+				<a href="http://www.opera.com/">Opera</a></canvas>
+			</div>
+
+		</div>
+		<%= render partial: "shared/footer" %>
+	</body>
+</html>

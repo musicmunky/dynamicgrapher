@@ -1,0 +1,77 @@
+<div id="hideSidebar"><a href="javascript:void(0)" onclick="jsgui.hideSidebar()">&raquo;</a></div>
+<div id="showSidebar"><a href="javascript:void(0)" onclick="jsgui.showSidebar()">&laquo;</a></div>
+
+<div id="toolbar">
+	<div id="tool_select">
+		<a href="javascript:void(0)" onclick="jsgui.setTool('pointer')" id="tool_select_pointer" class="toolbar_option toolbar_selected">
+			<img src="assets/pointer.png" alt="Pointer" title="Pointer"/></a>
+		<a href="javascript:void(0)" onclick="jsgui.setTool('trace')" id="tool_select_trace" class="toolbar_option">
+			<img src="assets/trace.png" alt="Trace" title="Trace"/></a>
+		<a href="javascript:void(0)" onclick="jsgui.setTool('vertex')" id="tool_select_vertex" class="toolbar_option">
+			<img src="assets/minmax.png" alt="Local Minima/Maxima" title="Local Minima/Maxima"/></a>
+		<a href="javascript:void(0)" onclick="jsgui.setTool('root')" id="tool_select_root" class="toolbar_option">
+			<img src="assets/root.png" alt="Root" title="Root"/></a>
+		<a href="javascript:void(0)" onclick="jsgui.setTool('intersect')" id="tool_select_intersect" class="toolbar_option">
+			<img src="assets/intersect.png" alt="Intersect" title="Intersect"/></a>
+		<a href="javascript:void(0)" onclick="jsgui.setTool('derivative')" id="tool_select_derivative" class="toolbar_option">
+			<img src="assets/derivative.png" alt="Derivative" title="Derivative"/></a>
+		<a href="javascript:void(0)" onclick="jsgui.setTool('zoombox')" id="tool_select_zoombox" class="toolbar_option">
+			<img src="assets/zoombox.png" alt="ZoomBox" title="ZoomBox"/></a>
+		<a href="javascript:void(0)" onclick="jsgui.setTool('zoomin')" id="tool_select_zoomin" class="toolbar_option">
+			<img src="assets/zoomin.png" alt="Zoom In" title="Zoom In"/></a>
+		<a href="javascript:void(0)" onclick="jsgui.setTool('zoomout')" id="tool_select_zoomout" class="toolbar_option">
+			<img src="assets/zoomout.png" alt="Zoom Out" title="Zoom Out"/></a>
+	</div>
+</div>
+
+<div id="toolboxes">
+	<div class="toolbox" id="toolbox_zoombox">
+		<div class="toolbox_header">
+			<div class="toolbox_close"><a href="javascript: void(0)">close</a></div>
+			Window Options
+		</div>
+		<div class="toolbox_main">
+			<table style="margin-left:auto;margin-right:auto;margin-top:10px;">
+				<tr>
+					<td>y-max: </td>
+					<td align="center"><input id="toolbox_zoombox_ymax" class="jsgcalc_ymax" type="text" size="4" /></td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>x-min:<br /><input id="toolbox_zoombox_xmin" class="jsgcalc_xmin" type="text" size="4" /></td>
+					<td align="center"><img src="assets/graph.png" style="width: 70px;"/></td>
+					<td>x-max:<br /><input id="toolbox_zoombox_xmax" class="jsgcalc_xmax" type="text" size="4" /></td>
+				</tr>
+				<tr>
+					<td>y-min: </td>
+					<td align="center"><input id="toolbox_zoombox_ymin" class="jsgcalc_ymin" type="text" size="4" /></td>
+					<td></td>
+				</tr>
+			</table>
+			<div style="height:30px;margin:10px;">
+				<a class="fancybutton" href="javascript: void(0)" style="float:left;"
+				   nclick="jsgcalc.setWindow($('#toolbox_zoombox_xmin').val(), $('#toolbox_zoombox_xmax').val(), $('#toolbox_zoombox_ymin').val(), $('#toolbox_zoombox_ymax').val())">Apply</a>
+				<a class="fancybutton" style="float:right;" href="javascript: void(0);" onclick="jsgcalc.resetZoom()">Reset</a>
+			</div>
+		</div>
+	</div>
+
+	<div class="toolbox" id="toolbox_trace">
+		<div class="toolbox_header">
+			<div class="toolbox_close"><a href="javascript: void(0)">close</a></div>
+			Trace
+		</div>
+
+		<div class="toolbox_main">
+			<div style="width:100%;float:left;margin:5px;">
+				x: <input id="toolbox_trace_input" class="jsgcalc_trace_input" type="text" size="20" style="width: 95%" />
+			</div>
+			<div style="width:100%;float:left;margin:5px;">
+				y: <input id="toolbox_trace_output" class="jsgcalc_trace_output" type="text" size="20" style="width: 95%" />
+			</div>
+			<div style="height:30px;margin:10px 5px;float:left;">
+				<a class="fancybutton" href="javascript: void(0)" onclick="jsgui.doTrace($('#toolbox_trace_input').val())">Trace</a>
+			</div>
+		</div>
+	</div>
+</div>
