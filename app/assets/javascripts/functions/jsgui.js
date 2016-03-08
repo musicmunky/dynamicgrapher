@@ -1,6 +1,6 @@
 function JSgui() {
 	this.currtool = "pointer";
-	this.currEq = 0;
+	this.currEq = "";
 	this.gridlines = "normal";
 	this.settings = {};
 
@@ -61,7 +61,6 @@ function JSgui() {
 		$("#showSidebar").show();
 		$("#toolbar").css("right", "0px");
 		jsgcalc.resizeGraph($("#wrapper").width() - widthPlusPadding("#toolbar"), $("#wrapper").height());
-
 		this.setTool(this.currtool);
 	}
 
@@ -71,7 +70,6 @@ function JSgui() {
 		$("#showSidebar").hide();
 		$("#toolbar").css("right", "282px");
 		jsgcalc.resizeGraph($("#wrapper").width() - $("#sidewrapper").width() - widthPlusPadding("#toolbar"), $("#wrapper").height());
-
 		this.setTool(this.currtool);
 	}
 
@@ -104,6 +102,7 @@ function JSgui() {
 
 	this.addInput = function(h) {
 		var func = h || {};
+		var nfid = "";
  		try {
 			if(!("equation" in func)) //completely new function
 			{
@@ -115,15 +114,18 @@ function JSgui() {
 					func = {
 						equation: "",
 						color: newcolor,
-						id: fid
+						id: fid,
+						params: { a:{ min:-10, max:10, value: 0 }, b:{ min:-10, max:10, value: 0 }, c:{ min:-10, max:10, value: 0 } }
 					};
 					try {
 						localStorage.setItem(fid, JSON.stringify(func));
+						nfid = fid;
 					}
 					catch(err) {
 						FUSION.error.logError(err, "Unable to create localStorage item: ");
 						return false;
 					}
+
 				}
 				else {
 					console.log("Tried to add too many equations");
@@ -131,6 +133,7 @@ function JSgui() {
 				}
 			}
 			this.refreshInputs();
+			return nfid;
 		}
 		catch(err) {
 			console.log("JSGui Error: " + err.message);
@@ -152,8 +155,9 @@ function JSgui() {
 		localStorage.removeItem(id);
 
 		if(parent.childNodes.length < 1) {
-			this.addInput();
- 			this.refreshInputs();
+			var eq = this.addInput();
+			this.selectEquation(eq);
+ 			//this.refreshInputs();
 		}
 	}
 
@@ -203,6 +207,7 @@ function JSgui() {
 				var id = $(this).attr("id");
 				var ky = String(id).replace("graph_input_wrapper_", "");
 				jsgui.selectEquation(ky);
+				setParamValues(ky);
 			});
 		});
 

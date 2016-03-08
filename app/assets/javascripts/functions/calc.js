@@ -98,19 +98,16 @@ function calc() {
         var expr = math.parse(equation);
         var variables = this.variablesInExpression(expr);
 
-// 		dump(equation + ', guess: ' + guess);
 		//Newton's method becomes very inaccurate if the root is too close to zero. Therefore we just whift everything over a few units.
 		if((guess > -0.1 && guess < 0.1) && shifted != true) {
-            var replacedEquation = equation;
+			var replacedEquation = equation;
 
-            if (variables.length > 0) {
-              var v = variables[0];
-              replacedEquation = replacedEquation.replace(new RegExp('\\b' + v + '\\b', 'g'), '(' + v + '+5)');
-            }
+			if (variables.length > 0) {
+				var v = variables[0];
+				replacedEquation = replacedEquation.replace(new RegExp('\\b' + v + '\\b', 'g'), '(' + v + '+5)');
+			}
 
-// 			dump('Replaced equation = ' + replacedEquation);
 			var answer = this.getRoot(replacedEquation, (guess - 5), range, true);
-// 			dump(answer);
 			if(answer !== false)
 				return answer + 5;
 			return false;
@@ -123,19 +120,19 @@ function calc() {
 		var prev = guess;
 		var j = 0;
 
-//         var code = expr.compile(math);
         var code = expr.compile();
         var variables = this.variablesInExpression(expr);
 
-        var f = function (x) {
-            var scope = {};
+		var f = function (x) {
+			var scope = {};
 
-            _(variables).each(function (name) {
-               scope[name] = x;
-            });
+			_(variables).each(function (name) {
+				if(name == "x") { scope[name] = x; }
+				else { scope[name] = parseFloat(FUSION.get.node(name + "_val_span").innerHTML); }
+			});
 
-           return code.eval(scope);
-        };
+			return code.eval(scope);
+		};
 
 		while (prev > center - range && prev < center + range && j < 100) {
 			var xval = prev;
@@ -149,17 +146,13 @@ function calc() {
 			if (!isFinite(derivative))
 				break;
 
-			//dump('d/dx = ' + derivative);
 			prev = prev - answer / derivative;
 			j++;
 		}
 
 		if (j >= 100) {
-//             dump('Convergence failed, best root = ' + prev);
             return prev;
 		}
-
-// 		dump('false: center at ' + center + ' but guess at ' + prev);
 
 		return false;
 	};

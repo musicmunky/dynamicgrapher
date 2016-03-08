@@ -16,6 +16,7 @@ jQuery( document ).ready(function() {
 		var allfncs = getAllFunctions();
 		if(allfncs.length > 0)
 		{
+			jsgui.selectEquation(allfncs[0].id);
  			for(var j = 0; j < allfncs.length; j++)
 			{
 				jsgui.addInput(allfncs[j]);
@@ -23,7 +24,8 @@ jQuery( document ).ready(function() {
 		}
 		else
 		{
-			jsgui.addInput();
+			var eq = jsgui.addInput();
+			jsgui.selectEquation(eq);
 		}
 
 		$(".toolbox_close a").click(function() {
@@ -53,29 +55,26 @@ jQuery( document ).ready(function() {
 				FUSION.get.node("a_max").value = s.max;
 				FUSION.get.node("a_val_span").innerHTML = s.value;
 			},
-			onSlideStart: function (position, value) {
-				//console.info('onSlideStart', 'position: ' + position, 'value: ' + value);
-			},
+			onSlideStart: function (value, percent, position) {},
 			onSlide: function (value, percent, position) {
-				updateParam("a", value);
+				updateDisplayParam("a", value);
 				jsgui.evaluate();
-				//console.log('onSlide', 'position: ' + position, 'value: ' + value, 'percent: ' + percent);
 			},
-			onSlideEnd: function (position, value) {
-				//console.warn('onSlideEnd', 'position: ' + position, 'value: ' + value);
+			onSlideEnd: function (value, percent, position) {
+				updateLsParam("a", value);
 			}
 		});
 
 		var bslider = FUSION.get.node("b_slider");
 		rangeSlider.create(bslider, {
-			polyfill: true,     // Boolean, if true, custom markup will be created
+			polyfill: true,
 			rangeClass: 'rangeSlider',
 			fillClass: 'rangeSlider__fill',
 			handleClass: 'rangeSlider__handle',
 			startEvent: ['mousedown', 'touchstart', 'pointerdown'],
 			moveEvent: ['mousemove', 'touchmove', 'pointermove'],
 			endEvent: ['mouseup', 'touchend', 'pointerup'],
-			borderRadius: 10,    // Number, if you use buffer + border-radius in css for looks good,
+			borderRadius: 10,
 			onInit: function () {
 				var s = FUSION.get.node("b_slider");
 				FUSION.get.node("b_min").value = s.min;
@@ -83,21 +82,24 @@ jQuery( document ).ready(function() {
 				FUSION.get.node("b_val_span").innerHTML = s.value;
 			},
 			onSlide: function (value, percent, position) {
-				updateParam("b", value);
+				updateDisplayParam("b", value);
 				jsgui.evaluate();
 			},
+			onSlideEnd: function (value, percent, position) {
+				updateLsParam("b", value);
+			}
 		});
 
 		var cslider = FUSION.get.node("c_slider");
 		rangeSlider.create(cslider, {
-			polyfill: true,     // Boolean, if true, custom markup will be created
+			polyfill: true,
 			rangeClass: 'rangeSlider',
 			fillClass: 'rangeSlider__fill',
 			handleClass: 'rangeSlider__handle',
 			startEvent: ['mousedown', 'touchstart', 'pointerdown'],
 			moveEvent: ['mousemove', 'touchmove', 'pointermove'],
 			endEvent: ['mouseup', 'touchend', 'pointerup'],
-			borderRadius: 10,    // Number, if you use buffer + border-radius in css for looks good,
+			borderRadius: 10,
 			onInit: function () {
 				var s = FUSION.get.node("c_slider");
 				FUSION.get.node("c_min").value = s.min;
@@ -105,9 +107,12 @@ jQuery( document ).ready(function() {
 				FUSION.get.node("c_val_span").innerHTML = s.value;
 			},
 			onSlide: function (value, percent, position) {
-				updateParam("c", value);
+				updateDisplayParam("c", value);
 				jsgui.evaluate();
 			},
+			onSlideEnd: function (value, percent, position) {
+				updateLsParam("c", value);
+			}
 		});
 	}
 	else
@@ -119,7 +124,48 @@ jQuery( document ).ready(function() {
 });
 
 
-function updateParam(p, v)
+function setParamValues(k)
+{
+	if(FUSION.lib.isBlank(k)) {
+		console.log("Param is blank - unable to update sliders");
+		return false;
+	}
+	var ls = getItemByKey(k);
+	if(FUSION.get.objSize(ls) > 0)
+	{
+		var prms = ls.params;
+		for(var p in prms)
+		{
+			var pstr = p.toString();
+			var sldr = FUSION.get.node(pstr + "_slider");
+			sldr.rangeSlider.update({min: prms[p].min, max: prms[p].max, value: prms[p].value});
+			FUSION.get.node(pstr + "_min").value = prms[p].min;
+			FUSION.get.node(pstr + "_max").value = prms[p].max;
+			FUSION.get.node(pstr + "_val_span").innerHTML = prms[p].value;
+		}
+	}
+}
+
+
+function updateLsParam(p, v)
+{
+	var param = p || "";
+	var value = v || 0;
+	if(FUSION.lib.isBlank(param)) {
+		console.log("Param is blank - unable to update functions");
+		return false;
+	}
+
+	var ls = getItemByKey(jsgui.currEq);
+	if(!FUSION.lib.isBlank(jsgui.currEq) && FUSION.get.objSize(ls) > 0)
+	{
+		ls.params[param].value = v;
+		localStorage.setItem(ls.id, JSON.stringify(ls));
+	}
+}
+
+
+function updateDisplayParam(p, v)
 {
 	var param = p || "";
 	var value = v || 0;
@@ -158,8 +204,22 @@ function updateMinMax(p)
 		else if(newval > a) {
 			newval = a;
 		}
-		sld.rangeSlider.update({min: parseFloat(min.value), max: parseFloat(max.value), value: parseFloat(newval)});
-		updateParam(p, newval);
+
+		var pfmin = parseFloat(min.value);
+		var pfmax = parseFloat(max.value);
+		var pfval = parseFloat(newval);
+
+		var ls = getItemByKey(jsgui.currEq);
+		if(!FUSION.lib.isBlank(jsgui.currEq) && FUSION.get.objSize(ls) > 0)
+		{
+			ls.params[p].min = pfmin;
+			ls.params[p].max = pfmax;
+			ls.params[p].value = pfval;
+			localStorage.setItem(ls.id, JSON.stringify(ls));
+		}
+
+		sld.rangeSlider.update({min: pfmin, max: pfmax, value: pfval});
+		updateDisplayParam(p, pfval);
 	}
 	catch(err) {
 		console.log("Error updating Min/Max: " + err.toString());
