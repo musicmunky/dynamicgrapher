@@ -238,16 +238,16 @@ function calc() {
 	};
 
 	this.roundToSignificantFigures = function (num, n) {
-	    if(num === 0) {
-	        return 0;
-	    }
+		if(num === 0) {
+			return 0;
+		}
 
-	    d = Math.ceil(math.log10(num < 0 ? -num: num));
-	    power = n - d;
+		var d = Math.ceil(math.log10(num < 0 ? -num: num));
+		var power = n - d;
 
-	    magnitude = Math.pow(10, power);
-	    shifted = Math.round(num*magnitude);
-	    return shifted/magnitude;
+		var magnitude = Math.pow(10, power);
+		var shifted = Math.round(num*magnitude);
+		return shifted/magnitude;
 	};
 
 	this.roundFloat = function(val) {	//Stupid floating point inprecision...
