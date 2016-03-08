@@ -24,6 +24,35 @@ function getItemByKey(i)
 }
 
 
+function setParamValues(k)
+{
+	var key = k || "";
+	if(FUSION.lib.isBlank(key)) {
+		console.log("Param is blank - unable to update sliders");
+		return false;
+	}
+	var ls = getItemByKey(key);
+	if(FUSION.get.objSize(ls) > 0)
+	{
+		var prms = ls.params;
+		for(var p in prms)
+		{
+			try {
+				var pstr = p.toString();
+				var sldr = FUSION.get.node(pstr + "_slider");
+				sldr.rangeSlider.update({min: prms[p].min, max: prms[p].max, value: prms[p].value});
+				FUSION.get.node(pstr + "_min").value = prms[p].min;
+				FUSION.get.node(pstr + "_max").value = prms[p].max;
+				FUSION.get.node(pstr + "_val_span").innerHTML = prms[p].value;
+			}
+			catch(err) {
+				console.log("Error Setting Parameter info: " + err.toString());
+			}
+		}
+	}
+}
+
+
 function dump(text) {
 	console.log(text);
 }

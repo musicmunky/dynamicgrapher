@@ -124,29 +124,6 @@ jQuery( document ).ready(function() {
 });
 
 
-function setParamValues(k)
-{
-	if(FUSION.lib.isBlank(k)) {
-		console.log("Param is blank - unable to update sliders");
-		return false;
-	}
-	var ls = getItemByKey(k);
-	if(FUSION.get.objSize(ls) > 0)
-	{
-		var prms = ls.params;
-		for(var p in prms)
-		{
-			var pstr = p.toString();
-			var sldr = FUSION.get.node(pstr + "_slider");
-			sldr.rangeSlider.update({min: prms[p].min, max: prms[p].max, value: prms[p].value});
-			FUSION.get.node(pstr + "_min").value = prms[p].min;
-			FUSION.get.node(pstr + "_max").value = prms[p].max;
-			FUSION.get.node(pstr + "_val_span").innerHTML = prms[p].value;
-		}
-	}
-}
-
-
 function updateLsParam(p, v)
 {
 	var param = p || "";
