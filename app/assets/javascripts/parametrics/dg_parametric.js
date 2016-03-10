@@ -3,7 +3,7 @@ jQuery( document ).ready(function() {
 	if(FUSION.lib.supportsHtml5Storage())
 	{
 		try {
-			jsgui = new JSgui;
+			jsguip = new JSgui;
 			jsgcalc = new JSgCalc("graph");
 			jsgcalc.initCanvas();
 		}
@@ -18,12 +18,12 @@ jQuery( document ).ready(function() {
 		{
  			for(var j = 0; j < allparms.length; j++)
 			{
-				jsgui.addParamSystem(allparms[j]);
+				jsguip.addParamSystem(allparms[j]);
 			}
 		}
 		else
 		{
-			jsgui.addParamSystem();
+			jsguip.addParamSystem();
 		}
 
 		$(".toolbox_close a").click(function() {
@@ -32,7 +32,7 @@ jQuery( document ).ready(function() {
 
 		$(".graph_equation_display").keyup(function(event){
 			if(event.keyCode == 13){
-				jsgui.evaluate();
+				jsguip.evaluate();
 			}
 		});
 
@@ -58,7 +58,7 @@ jQuery( document ).ready(function() {
 			},
 			onSlide: function (value, percent, position) {
 				updateParam("a", value);
-				jsgui.evaluate();
+				jsguip.evaluate();
 				//console.log('onSlide', 'position: ' + position, 'value: ' + value, 'percent: ' + percent);
 			},
 			onSlideEnd: function (position, value) {
@@ -84,7 +84,7 @@ jQuery( document ).ready(function() {
 			},
 			onSlide: function (value, percent, position) {
 				updateParam("b", value);
-				jsgui.evaluate();
+				jsguip.evaluate();
 			},
 		});
 
@@ -106,7 +106,7 @@ jQuery( document ).ready(function() {
 			},
 			onSlide: function (value, percent, position) {
 				updateParam("c", value);
-				jsgui.evaluate();
+				jsguip.evaluate();
 			},
 		});
 	}
@@ -186,7 +186,6 @@ function getAllParametrics()
 			{
 				gaplso = JSON.parse(gaplss);
 				if(gaplso.equation && !FUSION.lib.isBlank(gaplso.equation)) {
-					//add functions with an equation to the front of the array...
 					gaplsa.unshift(gaplso);
 				}
 				else {

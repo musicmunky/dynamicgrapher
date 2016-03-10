@@ -551,7 +551,22 @@
                 this._setBufferPosition(this.options.buffer);
             }
             this._updatePercentFromValue();
-            this.element.dispatchEvent(new Event('change'));
+			try {
+	            this.element.dispatchEvent(new Event('change'));
+			}
+			catch(err1) {
+				//yes, a nested "try...catch"...stupid IE, get your crap together!!
+				try {
+					console.log("rangeSlider error1: " + err1.toString() + " - Trying this again with deprecated javascript...");
+					var evt = document.createEvent("Event");
+					// params: string type, boolean bubbles_up, boolean is_cancelable
+					evt.initEvent("change", false, true);
+					this.element.dispatchEvent(evt);
+				}
+				catch(err2) {
+					console.log("rangeSlider error2 (tried both methods, neither worked): " + err2.toString());
+				}
+			}
         };
 
 

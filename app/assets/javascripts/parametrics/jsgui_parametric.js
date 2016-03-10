@@ -115,7 +115,8 @@ function JSgui() {
 					syst = {
 						x: { equation: "", color: newcolor },
 						y: { equation: "", color: newcolor },
-						id: sid
+						id: sid,
+						params: { a:{ min:-10, max:10, value: 0 }, b:{ min:-10, max:10, value: 0 }, c:{ min:-10, max:10, value: 0 } }
 					};
 					try {
 						localStorage.setItem(sid, JSON.stringify(syst));
@@ -130,7 +131,7 @@ function JSgui() {
 					alert("Sorry, there is a limit of 5 equations for this app!");
 				}
 			}
-			this.refreshInputs();
+			this.refreshParamSystems();
 		}
 		catch(err) {
 			console.log("JSGui Error: " + err.message);
@@ -138,43 +139,8 @@ function JSgui() {
 		}
 	}
 
-	this.addInput = function(h) {
-		var func = h || {};
- 		try {
-			if(!("equation" in func)) //completely new function
-			{
-				var allfuncs = getAllFunctions();
-				if(allfuncs.length < 5) {
-					this.updateInputData();
-					var newcolor = randomColor();
-					var fid = "DynGraph_" + FUSION.lib.getRandomInt(100000,999999) + "_function";
-					func = {
-						equation: "",
-						color: newcolor,
-						id: fid
-					};
-					try {
-						localStorage.setItem(fid, JSON.stringify(func));
-					}
-					catch(err) {
-						FUSION.error.logError(err, "Unable to create localStorage item: ");
-						return false;
-					}
-				}
-				else {
-					console.log("Tried to add too many equations");
-					alert("Sorry, there is a limit of 5 equations for this app!");
-				}
-			}
-			this.refreshInputs();
-		}
-		catch(err) {
-			console.log("JSGui Error: " + err.message);
-			return false;
-		}
-	}
 
-	this.removeInput = function(i) {
+	this.removeSystem = function(i) {
 		var id = i;
 		if(FUSION.lib.isBlank(id)) {
 			console.log("Blank id - can not remove function");
@@ -188,67 +154,9 @@ function JSgui() {
 		localStorage.removeItem(id);
 
 		if(parent.childNodes.length < 1) {
-			this.addInput();
- 			this.refreshInputs();
+			this.addParamSystem();
+ 			this.refreshParamSystems();
 		}
-	}
-
-	this.refreshInputs = function() {
-		var functions = getAllFunctions();
-		for(var i = 0; i < functions.length; i++) {
-			if(!FUSION.get.node("graph_input_wrapper_" + functions[i].id)) {
-				var giw = FUSION.lib.createHtmlElement({"type":"div", "attributes":{"id":"graph_input_wrapper_" + functions[i].id, "class":"graph_input_wrapper"},
-													    "style":{"float":"left", "width":"100%"}});
-				var rem = FUSION.lib.createHtmlElement({"type":"button", "onclick":"jsgui.removeInput('" + functions[i].id + "')",
-														"attributes":{"id":"graph_equation_remover_" + functions[i].id, "class":"glyphicon glyphicon-trash graph_equation_remover"}});
-
-
-				var gci = FUSION.lib.createHtmlElement({"type":"div","attributes":{"id":"graph_color_indicator_" + functions[i].id, "class":"graph_color_indicator"}});
-				var btn = FUSION.lib.createHtmlElement({"type":"input",
-														"attributes":{"id":"gcibtn_" + functions[i].id, "value":"", "type":"button"},
-													    "style":{"background-color":"rgba(0,0,0,0)", "width":"100%", "height":"100%", "border":"none", "padding":"0px", "cursor":"pointer"}});
-
-				var ged = FUSION.lib.createHtmlElement({"type":"div", "attributes":{"class":"graph_equation_display"}});
-				var spn = FUSION.lib.createHtmlElement({"type":"span", "text":"y ="});
-				var fin = FUSION.lib.createHtmlElement({"type":"input", "attributes":{"id":"graph_input_" + functions[i].id, "size":"20", "value":functions[i].equation}});
-
-				ged.appendChild(spn);
-				ged.appendChild(fin);
-				gci.appendChild(btn);
-				giw.appendChild(rem);
-				giw.appendChild(gci);
-				giw.appendChild(ged);
-				FUSION.get.node("graph_inputs").appendChild(giw);
-
-				var opts = {
-					closable:true,
-					valueElement:'colorpickervalue',
-					styleElement:'graph_color_indicator_' + functions[i].id,
-					required: false,
-					value: functions[i].color
-				};
-
-				var picker = new jscolor(FUSION.get.node("gcibtn_" + functions[i].id), opts);
-
-				$("#graph_color_indicator_" + functions[i].id).css("backgroundColor", functions[i].color);
-			}
-		}
-
-		$("#graph_inputs div.graph_input_wrapper").each(function() {
-			$(this).bind("click", function() {
-				var id = $(this).attr("id");
-				var ky = String(id).replace("graph_input_wrapper_", "");
-				jsgui.selectEquation(ky);
-			});
-		});
-
-		$(".graph_equation_display").keyup(function(event){
-			if(event.keyCode == 13){
-				jsgui.evaluate();
-			}
-		});
-
-		$("#graph_input_wrapper_" + this.currEq).addClass("active_equation");
 	}
 
 
@@ -258,7 +166,7 @@ function JSgui() {
 			if(!FUSION.get.node("graph_input_wrapper_" + systems[i].id)) {
 				var giw = FUSION.lib.createHtmlElement({"type":"div", "attributes":{"id":"graph_input_wrapper_" + systems[i].id, "class":"graph_input_wrapper"},
 													    "style":{"float":"left", "width":"100%"}});
-				var rem = FUSION.lib.createHtmlElement({"type":"button", "onclick":"jsgui.removeInput('" + systems[i].id + "')",
+				var rem = FUSION.lib.createHtmlElement({"type":"button", "onclick":"jsguip.removeInput('" + systems[i].id + "')",
 														"attributes":{"id":"graph_equation_remover_" + systems[i].id, "class":"glyphicon glyphicon-trash graph_equation_remover"}});
 
 
@@ -297,13 +205,13 @@ function JSgui() {
 			$(this).bind("click", function() {
 				var id = $(this).attr("id");
 				var ky = String(id).replace("graph_input_wrapper_", "");
-				jsgui.selectEquation(ky);
+				jsguip.selectEquation(ky);
 			});
 		});
 
 		$(".graph_equation_display").keyup(function(event){
 			if(event.keyCode == 13){
-				jsgui.evaluate();
+				jsguip.evaluate();
 			}
 		});
 
