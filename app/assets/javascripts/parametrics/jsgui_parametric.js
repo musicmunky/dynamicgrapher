@@ -1,4 +1,4 @@
-function JSgui() {
+function JSguiParam() {
 	this.currtool = "pointer";
 	this.currEq = 0;
 	this.gridlines = "normal";
@@ -9,23 +9,23 @@ function JSgui() {
 		q2 = String(q).replace(".", "");
 		$("#quality_select_" + q2).addClass("option_selected");
 
-		jsgcalc.quality = q;
-		jsgcalc.draw();
+		jsgcalcp.quality = q;
+		jsgcalcp.draw();
 	}
 
 	this.setAngles = function(q) {
 		$("#angle_select a").removeClass("option_selected");
 		$("#angle_select_" + q).addClass("option_selected");
 
-		Calc.angles = q;
-		jsgcalc.draw();
+		CalcParam.angles = q;
+		jsgcalcp.draw();
 	}
 
 	this.selectEquation = function(x) {
 		this.currEq = x;
-		$("#graph_inputs div.graph_input_wrapper").removeClass("active_equation");
-		$("#graph_input_wrapper_" + x).addClass("active_equation");
-		jsgcalc.draw();
+		$("#graph_systems div.graph_system_wrapper").removeClass("active_equation");
+		$("#graph_system_wrapper_" + x).addClass("active_equation");
+		jsgcalcp.draw();
 	}
 
 	this.setTool = function(t) {
@@ -39,12 +39,12 @@ function JSgui() {
 		$("#toolbox_" + t).css("right", $(document).width() - $("#tool_select_" + t).offset().left + 5);
 
 		this.currtool = t;
-		jsgcalc.draw();
+		jsgcalcp.draw();
 	}
 
 	this.doTrace = function(xval) {
-		jsgcalc.draw();
-		jsgcalc.drawTrace(jsgcalc.getEquation(this.currEq), "#000000", xval);
+		jsgcalcp.draw();
+		jsgcalcp.drawTrace(jsgcalcp.getEquation(this.currEq), "#000000", xval);
 	}
 
 	this.setGridlines = function(t) {
@@ -52,7 +52,7 @@ function JSgui() {
 		$("#gridlines_select_" + t).addClass("option_selected");
 
 		this.gridlines = t;
-		jsgcalc.draw();
+		jsgcalcp.draw();
 	}
 
 	this.hideSidebar = function() {
@@ -60,7 +60,7 @@ function JSgui() {
 		$("#hideSidebar").hide();
 		$("#showSidebar").show();
 		$("#toolbar").css("right", "0px");
-		jsgcalc.resizeGraph($("#wrapper").width() - widthPlusPadding("#toolbar"), $("#wrapper").height());
+		jsgcalcp.resizeGraph($("#wrapper").width() - widthPlusPadding("#toolbar"), $("#wrapper").height());
 
 		this.setTool(this.currtool);
 	}
@@ -70,7 +70,7 @@ function JSgui() {
 		$("#hideSidebar").show();
 		$("#showSidebar").hide();
 		$("#toolbar").css("right", "282px");
-		jsgcalc.resizeGraph($("#wrapper").width() - $("#sidewrapper").width() - widthPlusPadding("#toolbar"), $("#wrapper").height());
+		jsgcalcp.resizeGraph($("#wrapper").width() - $("#sidewrapper").width() - widthPlusPadding("#toolbar"), $("#wrapper").height());
 
 		this.setTool(this.currtool);
 	}
@@ -79,11 +79,12 @@ function JSgui() {
 		var id = "";
 		var ky = "";
 		var ls = {};
-		$("#graph_inputs div.graph_input_wrapper").each(function() {
+		$("#graph_systems div.graph_system_wrapper").each(function() {
 			id = $(this).attr('id');
-			ky = String(id).replace("graph_input_wrapper_", "");
+			ky = String(id).replace("graph_system_wrapper_", "");
 			ls = getItemByKey(ky);
-			ls.equation = FUSION.get.node("graph_input_" + ky).value;
+			ls.x.equation = FUSION.get.node("graph_system_x_" + ky).value;
+			ls.y.equation = FUSION.get.node("graph_system_y_" + ky).value;
 			ls.color = $(".graph_color_indicator", this).css('backgroundColor');
 			localStorage.setItem(ky, JSON.stringify(ls));
 		});
@@ -91,15 +92,15 @@ function JSgui() {
 
 	this.evaluate = function() {
 		this.updateInputData();
-		jsgcalc.draw();
+		jsgcalcp.draw();
 	}
 
 	//Update gui values
 	this.updateValues = function() {
-		$("input.jsgcalc_xmin").val(Math.round(jsgcalc.currCoord.x1 * 1000) / 1000);
-		$("input.jsgcalc_xmax").val(Math.round(jsgcalc.currCoord.x2 * 1000) / 1000);
-		$("input.jsgcalc_ymin").val(Math.round(jsgcalc.currCoord.y1 * 1000) / 1000);
-		$("input.jsgcalc_ymax").val(Math.round(jsgcalc.currCoord.y2 * 1000) / 1000);
+		$("input.jsgcalc_xmin").val(Math.round(jsgcalcp.currCoord.x1 * 1000) / 1000);
+		$("input.jsgcalc_xmax").val(Math.round(jsgcalcp.currCoord.x2 * 1000) / 1000);
+		$("input.jsgcalc_ymin").val(Math.round(jsgcalcp.currCoord.y1 * 1000) / 1000);
+		$("input.jsgcalc_ymax").val(Math.round(jsgcalcp.currCoord.y2 * 1000) / 1000);
 	}
 
 	this.addParamSystem = function(h) {
@@ -135,7 +136,7 @@ function JSgui() {
 			this.refreshParamSystems();
 		}
 		catch(err) {
-			console.log("JSGui Error: " + err.message);
+			console.log("JSguiParam Error: " + err.message);
 			return false;
 		}
 	}
@@ -149,7 +150,7 @@ function JSgui() {
 			return false;
 		}
 
-		var div = FUSION.get.node("graph_input_wrapper_" + id);
+		var div = FUSION.get.node("graph_system_wrapper_" + id);
 		var parent = div.parentNode;
 		parent.removeChild(div);
 		localStorage.removeItem(id);
@@ -164,29 +165,35 @@ function JSgui() {
 	this.refreshParamSystems = function() {
 		var systems = getAllParametrics();
 		for(var i = 0; i < systems.length; i++) {
-			if(!FUSION.get.node("graph_input_wrapper_" + systems[i].id)) {
-				var giw = FUSION.lib.createHtmlElement({"type":"div", "attributes":{"id":"graph_input_wrapper_" + systems[i].id, "class":"graph_input_wrapper"},
+			if(!FUSION.get.node("graph_system_wrapper_" + systems[i].id)) {
+				var giw = FUSION.lib.createHtmlElement({"type":"div", "attributes":{"id":"graph_system_wrapper_" + systems[i].id, "class":"graph_system_wrapper"},
 													    "style":{"float":"left", "width":"100%"}});
 				var rem = FUSION.lib.createHtmlElement({"type":"button", "onclick":"jsguip.removeInput('" + systems[i].id + "')",
+														"style":{"margin-top":"13px"},
 														"attributes":{"id":"graph_equation_remover_" + systems[i].id, "class":"glyphicon glyphicon-trash graph_equation_remover"}});
 
-
-				var gci = FUSION.lib.createHtmlElement({"type":"div","attributes":{"id":"graph_color_indicator_" + systems[i].id, "class":"graph_color_indicator"}});
+				var gci = FUSION.lib.createHtmlElement({"type":"div","attributes":{"id":"graph_color_indicator_" + systems[i].id, "class":"graph_color_indicator"}, "style":{"margin-top":"15px"}});
 				var btn = FUSION.lib.createHtmlElement({"type":"input",
 														"attributes":{"id":"gcibtn_" + systems[i].id, "value":"", "type":"button"},
 													    "style":{"background-color":"rgba(0,0,0,0)", "width":"100%", "height":"100%", "border":"none", "padding":"0px", "cursor":"pointer"}});
 
-				var ged = FUSION.lib.createHtmlElement({"type":"div", "attributes":{"class":"graph_equation_display"}});
-				var spn = FUSION.lib.createHtmlElement({"type":"span", "text":"y ="});
-				var fin = FUSION.lib.createHtmlElement({"type":"input", "attributes":{"id":"graph_input_" + systems[i].id, "size":"20", "value":systems[i].equation}});
+				var gedx = FUSION.lib.createHtmlElement({"type":"div", "attributes":{"class":"graph_equation_display"}, "style":{"margin-bottom":"3px"}});
+				var gedy = FUSION.lib.createHtmlElement({"type":"div", "attributes":{"class":"graph_equation_display"}});
+				var spnx = FUSION.lib.createHtmlElement({"type":"span", "text":"x ="});
+				var spny = FUSION.lib.createHtmlElement({"type":"span", "text":"y ="});
+				var finx = FUSION.lib.createHtmlElement({"type":"input", "attributes":{"id":"graph_system_x_" + systems[i].id, "size":"20", "value":systems[i].x.equation}});
+				var finy = FUSION.lib.createHtmlElement({"type":"input", "attributes":{"id":"graph_system_y_" + systems[i].id, "size":"20", "value":systems[i].y.equation}});
 
-				ged.appendChild(spn);
-				ged.appendChild(fin);
+				gedx.appendChild(spnx);
+				gedx.appendChild(finx);
+				gedy.appendChild(spny);
+				gedy.appendChild(finy);
 				gci.appendChild(btn);
 				giw.appendChild(rem);
 				giw.appendChild(gci);
-				giw.appendChild(ged);
-				FUSION.get.node("graph_inputs").appendChild(giw);
+				giw.appendChild(gedx);
+				giw.appendChild(gedy);
+				FUSION.get.node("graph_systems").appendChild(giw);
 
 				var opts = {
 					closable:true,
@@ -202,10 +209,10 @@ function JSgui() {
 			}
 		}
 
-		$("#graph_inputs div.graph_input_wrapper").each(function() {
+		$("#graph_systems div.graph_system_wrapper").each(function() {
 			$(this).bind("click", function() {
 				var id = $(this).attr("id");
-				var ky = String(id).replace("graph_input_wrapper_", "");
+				var ky = String(id).replace("graph_system_wrapper_", "");
 				jsguip.selectEquation(ky);
 			});
 		});
@@ -216,7 +223,7 @@ function JSgui() {
 			}
 		});
 
-		$("#graph_input_wrapper_" + this.currEq).addClass("active_equation");
+		$("#graph_system_wrapper_" + this.currEq).addClass("active_equation");
 	}
 
 

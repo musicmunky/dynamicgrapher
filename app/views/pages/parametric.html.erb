@@ -38,9 +38,18 @@
 				</div>
 			</div>
 			<input type="hidden" value="" id="colorpickervalue" onchange="updateFunctionColor()" />
-			<div id="graph_inputs" style="height:200px;border-bottom:1px solid #AAA;"></div>
+			<div id="graph_systems" style="height:100px;border-bottom:1px solid #AAA;"></div>
 			<div id="graph_parameters" style="height:200px;margin:5px;">
-				<span style="display:block;float:left;width:100%;font-size: 16px;height: 20px;margin-bottom: 20px;">Parameters:</span>
+				<span style="display:block;float:left;width:100%;font-size: 16px;height: 20px;margin-bottom: 20px;">T-Range:</span>
+				<div id="t_values" class="paramwrapperdiv" style="height:50px;border-bottom:1px solid #AAA;">
+					<input type="text" id="t_min" value="-10" class="minmax" onkeyup="updateTvalMinMax('t')" />
+					<span style="width:calc(100% - 100px);font-size:30px;display:inline-block;text-align:center;margin-top:-12px;">
+						&le;&nbsp;&nbsp;&nbsp;&nbsp; t &nbsp;&nbsp;&nbsp;&nbsp;&le;
+					</span>
+					<input type="text" id="t_max" value="10" class="minmax" onkeyup="updateTvalMinMax('t')" style="float:right;" />
+				</div>
+
+				<span style="display:block;float:left;width:100%;font-size: 16px;height: 20px;margin-bottom: 20px;margin-top:5px;">Parameters:</span>
 				<div id="a_param" class="paramwrapperdiv">
 					<div class="paramdiv">a = <span id="a_val_span">1</span></div>
 					<input type="text" id="a_min" value="0" class="minmax" onkeyup="updateMinMax('a')" />

@@ -15,9 +15,9 @@ function calcEps(){
 	return mchEps;
 }
 
-var Calc = {};
+var CalcParam = {};
 
-function calc() {
+function calcp() {
 	this.eqcache = new Object;
 	this.angles = 'radians';
 	this.loopcounter = 0;
@@ -48,14 +48,14 @@ function calc() {
 	_(['sin', 'cos', 'tan', 'sec', 'cot', 'csc']).each(function(name) {
 		var fn = math[name]; // the original function
 		replacements[name] = function replacement(x) {
-			return fn(Calc.convAngles(x));
+			return fn(CalcParam.convAngles(x));
 		};
 	});
 
 	_(['asin', 'acos', 'atan', 'atan2']).each(function(name) {
 		var fn = math[name]; // the original function
 		replacements[name] = function replacement(x) {
-			return Calc.convertRadians(fn(x));
+			return CalcParam.convertRadians(fn(x));
 		};
 	});
 
@@ -228,7 +228,7 @@ function calc() {
 		var expr = math.parse(equation);
 		var code = expr.compile();
 //		var code = expr.compile(math);
-		var variables = Calc.variablesInExpression(expr);
+		var variables = CalcParam.variablesInExpression(expr);
 
 		return function (x) {
 			var scope = {};
@@ -236,6 +236,7 @@ function calc() {
 			_(variables).each(function (name) {
 
 				if(name == "x") { scope[name] = x; }
+				else if(name == "y") { scope[name] = x; }
 				else { scope[name] = parseFloat(FUSION.get.node(name + "_val_span").innerHTML); }
 			});
 
@@ -245,16 +246,16 @@ function calc() {
 	};
 
 	this.roundToSignificantFigures = function (num, n) {
-	    if(num === 0) {
-	        return 0;
-	    }
+		if(num === 0) {
+			return 0;
+		}
 
-	    d = Math.ceil(math.log10(num < 0 ? -num: num));
-	    power = n - d;
+		var d = Math.ceil(math.log10(num < 0 ? -num: num));
+		var power = n - d;
 
-	    magnitude = Math.pow(10, power);
-	    shifted = Math.round(num*magnitude);
-	    return shifted/magnitude;
+		var magnitude = Math.pow(10, power);
+		var shifted = Math.round(num*magnitude);
+		return shifted/magnitude;
 	};
 
 	this.roundFloat = function(val) {	//Stupid floating point inprecision...
@@ -262,4 +263,4 @@ function calc() {
 	};
 }
 
-Calc = new calc();
+CalcParam = new calcp();
