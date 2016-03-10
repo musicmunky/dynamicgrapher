@@ -113,8 +113,9 @@ function JSgui() {
 					var newcolor = randomColor();
 					var sid = "DynGraph_" + FUSION.lib.getRandomInt(100000,999999) + "_parametric";
 					syst = {
-						x: { equation: "", color: newcolor },
-						y: { equation: "", color: newcolor },
+						x: { equation: "" },
+						y: { equation: "" },
+						color: newcolor,
 						id: sid,
 						params: { a:{ min:-10, max:10, value: 0 }, b:{ min:-10, max:10, value: 0 }, c:{ min:-10, max:10, value: 0 } }
 					};
