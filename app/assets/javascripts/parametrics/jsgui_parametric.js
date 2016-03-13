@@ -1,6 +1,6 @@
 function JSguiParam() {
 	this.currtool = "pointer";
-	this.currEq = 0;
+	this.currSys = "";
 	this.gridlines = "normal";
 	this.settings = {};
 
@@ -21,10 +21,10 @@ function JSguiParam() {
 		jsgcalcp.draw();
 	}
 
-	this.selectEquation = function(x) {
-		this.currEq = x;
+	this.selectSystem = function(k) {
+		this.currSys = k;
 		$("#graph_systems div.graph_system_wrapper").removeClass("active_equation");
-		$("#graph_system_wrapper_" + x).addClass("active_equation");
+		$("#graph_system_wrapper_" + k).addClass("active_equation");
 		jsgcalcp.draw();
 	}
 
@@ -44,7 +44,7 @@ function JSguiParam() {
 
 	this.doTrace = function(xval) {
 		jsgcalcp.draw();
-		jsgcalcp.drawTrace(jsgcalcp.getEquation(this.currEq), "#000000", xval);
+		jsgcalcp.drawTrace(jsgcalcp.getEquation(this.currSys), "#000000", xval);
 	}
 
 	this.setGridlines = function(t) {
@@ -118,7 +118,8 @@ function JSguiParam() {
 						y: { equation: "" },
 						color: newcolor,
 						id: sid,
-						params: { a:{ min:-10, max:10, value: 0 }, b:{ min:-10, max:10, value: 0 }, c:{ min:-10, max:10, value: 0 } }
+						t: { min:-10, max:10 },
+						params: { a: { min:-10, max:10, value: 0 }, b: { min:-10, max:10, value: 0 }, c: { min:-10, max:10, value: 0 } }
 					};
 					try {
 						localStorage.setItem(sid, JSON.stringify(syst));
@@ -213,7 +214,9 @@ function JSguiParam() {
 			$(this).bind("click", function() {
 				var id = $(this).attr("id");
 				var ky = String(id).replace("graph_system_wrapper_", "");
-				jsguip.selectEquation(ky);
+				jsguip.selectSystem(ky);
+				setParamValues(ky);
+				setTValues(ky);
 			});
 		});
 
@@ -223,7 +226,7 @@ function JSguiParam() {
 			}
 		});
 
-		$("#graph_system_wrapper_" + this.currEq).addClass("active_equation");
+		$("#graph_system_wrapper_" + this.currSys).addClass("active_equation");
 	}
 
 

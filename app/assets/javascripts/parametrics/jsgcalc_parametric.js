@@ -54,8 +54,8 @@ function JSgCalcParam (element){
 		return "#000000";
 	};
 
-	this.drawEquation = function(equation, color, thickness) {
-		if(!equation)
+	this.drawSystem = function(xeq, yeq, color, thickness) {
+		if(!xeq || !yeq)
 			return false;
 
 		var x1 = this.currCoord.x1;
@@ -68,8 +68,10 @@ function JSgCalcParam (element){
 
 		var scale = this.getScale();
 
-		if(!this.calccache[equation])
-			this.calccache[equation] = new Object;
+		if(!this.calccache[xeq])
+			this.calccache[xeq] = new Object;
+		if(!this.calccache[yeq])
+			this.calccache[yeq] = new Object;
 
 		this.ctx.strokeStyle = color;
 		var old_linewidth = this.ctx.linewidth
@@ -90,9 +92,56 @@ function JSgCalcParam (element){
 
 		var maxxval = this.width + inverseQuality;
 
-		var f = CalcParam.makeFunction(equation);
+		var f = CalcParam.makeFunction(xeq);
+		var g = CalcParam.makeFunction(yeq);
 
-		for(var i = 0; i < maxxval; i += inverseQuality) {
+
+		var tmin = parseFloat(FUSION.get.node("t_min").value);
+		var tmax = parseFloat(FUSION.get.node("t_max").value);
+
+		var cntr = tmin;
+
+//		console.log("COUNTER START: " + cntr);
+//  		for(var i = 0; i < maxxval; i += inverseQuality) {
+		while(cntr < tmax) {
+
+//			var xval = cntr * inverseScaleX + x1;	//calculate the x-value for a given pixel
+//          var yval = f(xval);
+
+			var xval = f(cntr);
+			var yval = g(cntr);
+//			console.log("XVAL: " + xval + "   YVAL: " + yval);
+
+			var xpos = this.width - ((xval - x1) * scale.x);
+			var ypos = this.height - ((yval - y1) * scale.y);
+//			console.log("XPOS: " + xpos + "    YPOS: " + ypos);
+
+			//The line is on the screen, or pretty close to it
+			if(ypos >= (this.height * -1) && ypos <= this.height * 2) {
+				if(lineExists > 1)
+					this.ctx.beginPath();
+
+				if(lastpoint !== false && ((lastpoint > 0 && yval < 0) || (lastpoint < 0 && yval > 0))) {
+					this.ctx.moveTo(xpos, ypos);
+				}
+				else {
+					this.ctx.lineTo(xpos, ypos);
+				}
+
+				lineExists = 0;
+				lastpoint = false;
+			}
+			else if(lineExists <= 1) {	//The line is off the screen
+				this.ctx.lineTo(xpos, ypos);
+				lastpoint = yval;
+				this.ctx.stroke();
+				lineExists++;
+			}
+			this.fillareapath.push([xpos, ypos]);
+			cntr += 0.01;
+		}
+
+		/*for(var i = 0; i < maxxval; i += inverseQuality) {
 			var xval = i * inverseScaleX + x1;	//calculate the x-value for a given pixel
             var yval = f(xval);
 
@@ -120,7 +169,7 @@ function JSgCalcParam (element){
 			}
 			this.fillareapath.push([i, ypos]);
 			//this.ctx.fillRect(i - 0.5, ypos - 0.5, 1, 1);
-		}
+		}*/
 		this.fillareapath.push([maxxval, this.height - ((-y1) * scale.y)]);
 		this.ctx.stroke();
 		this.ctx.linewidth = old_linewidth
@@ -187,6 +236,7 @@ function JSgCalcParam (element){
 		this.ctx.fillText(text, xpos-3, ypos-3);
 	};
 
+
 	this.drawDot = function(xval, yval, color, radius) {
 		if(!radius)
 			radius = 4;
@@ -198,135 +248,6 @@ function JSgCalcParam (element){
 		this.ctx.fillStyle = color;
 		this.ctx.arc(coord.x, coord.y, radius, 0, Math.PI*2, false);
 		this.ctx.fill();
-	};
-
-	//Draws thge vertex of an equation (i.e. when it changes direction)
-	this.drawVertex = function(equation, color, x) {
-		var f = CalcParam.makeFunction(equation);
-
-		var scale = this.getScale();
-		var xpos = x / scale.x + this.currCoord.x1;
-		var matchingDist = 20 / scale.x;
-		var answer = CalcParam.getVertex(f, xpos-matchingDist, xpos+matchingDist, 0.0000001);
-		var tries = 0;
-		while(answer === false) {
-			tries++;
-			if(tries > 5)
-				return false;
-			answer = CalcParam.getVertex(f, xpos-matchingDist-Math.random()/100, xpos+matchingDist+Math.random()/100, 0.0000001);
-		}
-		var xval = CalcParam.roundFloat(answer);
-		var yval = f(xval);
-		var yval = CalcParam.roundFloat(this.arbRound(yval, 0.0000001));
-		this.drawDot(xval, yval, color, 4);
-
-		//draw label text
-		this.drawLabel(xval, yval, CalcParam.roundFloat(this.arbRound(xval, 0.0000001))+", " + yval, "#000000");
-	};
-
-	//Draws the root of an equation (i.e. where x=0)
-	this.drawRoot = function(equation, color, x) {
-		var scale = this.getScale();
-		var xpos = x / scale.x + this.currCoord.x1;
-		//Calculate the root (within 50 pixels)
-		var answer = CalcParam.getRoot(equation, xpos, 50 / scale.x);
-		if(answer === false)
-			return false;
-
-		answer = Math.round(answer * 10000000) / 10000000;
-
-		var xval = CalcParam.roundFloat(answer);
-		var yval = 0;
-
-		this.drawDot(xval, yval, color, 4); //draw the dot
-		//draw label text
-		this.drawLabel(xval, yval, CalcParam.roundFloat(this.arbRound(xval, 0.00000001))+", " + yval);
-	};
-
-	//draws the intersection of an equation and the nearest equation to the mouse pointer
-	this.drawIntersect = function(equation1, color, x) {
-		var scale = this.getScale();
-		var xpos = x / scale.x + this.currCoord.x1;
-        var equation;
-
-		var answer = false;
-		var alleqs = getAllParametrics();
-		for(var i = 0; i < alleqs.length; i++) {
-			if(this.getEquation(alleqs[i].equation) == equation1)
-				continue;
-
-			var tempanswer = CalcParam.getIntersection(equation1, this.getEquation(alleqs[i].equation), xpos, 50 / scale.x);
-			if(tempanswer === false)
-				continue;
-			tempanswer = Math.round(tempanswer * 10000000) / 10000000;
-			dump(tempanswer);
-			if(tempanswer !== false && (answer === false || Math.abs(xpos - answer) > Math.abs(xpos - tempanswer))) {
-				answer = tempanswer;
-				equation = equation1;
-			}
-		}
-		if(answer === false)
-			return false;
-
-		var xval = CalcParam.roundFloat(answer);
-		var f = CalcParam.makeFunction(equation);
-
-		var yval = f(xval);
-
-		//Draw dot
-		this.drawDot(xval, yval, color, 4);
-
-		//draw label text
-		this.drawLabel(xval, yval, float_fix(xval) + ", " + float_fix(yval), color);
-	};
-
-	this.drawDerivative = function(equation, color, x) {
-		var f = CalcParam.makeFunction(equation);
-
-		var scale = this.getScale();
-		var xpos = CalcParam.roundFloat(this.arbRound(x / scale.x + this.currCoord.x1, this.xgridscale/100));
-
-		//Do the actual calculation.
-		var slope = Math.round(CalcParam.getDerivative(f, xpos) * 1000000) / 1000000;
-
-		var xval = xpos;
-		var yval = f(xval);
-		yval = CalcParam.roundFloat(this.arbRound(yval, 0.0000001));
-		var pos = this.getCoord(xval, yval);
-		this.ctx.beginPath();
-		this.ctx.fillStyle = color;
-		this.ctx.arc(pos.x, pos.y, 4, 0, Math.PI*2, false);
-		this.ctx.fill();
-
-		//draw derivative lines of exactly 2*xgridscale long
-		var xdist = this.xgridscale*2 / (Math.sqrt(Math.pow(slope, 2) + 1));
-		var ydist = xdist * slope;
-		var linestart = {x : xval - xdist, y : yval - ydist};
-		var lineend = {x : xval + xdist, y : yval + ydist};
-		this.ctx.beginPath();
-		this.ctx.strokeStyle = "#000000";
-		linestart = this.getCoord(linestart.x, linestart.y);
-		lineend = this.getCoord(lineend.x, lineend.y);
-		this.ctx.moveTo(linestart.x, linestart.y);
-		this.ctx.lineTo(lineend.x, lineend.y);
-		this.ctx.stroke();
-
-		//draw label text
-// 		this.ctx.font = "10pt 'open sans'";
-		this.ctx.font = "10pt 'Lucida Console'";
-		this.ctx.fillStyle = "#000000";
-		var text = "x="+xval+", d/dx="+slope;
-		var xval2 = xval;	//find out whether to put label above or below dot
-		xval -= this.xgridscale / 5;
-		var answer2 = f(xval);
-		xval += this.xgridscale / 10;
-		var answer3 = f(x);
-		if(pos.y-4 < this.charHeight || answer2 > answer3)
-			pos.y += this.charHeight + 3;
-		var textwidth = this.ctx.measureText(text).width;
-		if(pos.x-4 < textwidth)
-			pos.x += textwidth + 3;
-		this.ctx.fillText(text, pos.x-4, pos.y-4);
 	};
 
 
@@ -379,7 +300,7 @@ function JSgCalcParam (element){
 		var yscale = Math.max(yrange/this.height, 1E-20);
 
 		//Calculate the scale of the gridlines
-		for(i = 0.000000000001, c = 0; xrange/i > this.maxgridlines.x -1; c++) {
+		for(var i = 0.000000000001, c = 0; xrange / i > this.maxgridlines.x - 1; c++) {
 			if(c % 3 === 1) i *= 2.5;	//alternating between 2, 5 and 10
 			else i *= 2;
 
@@ -391,7 +312,7 @@ function JSgCalcParam (element){
 		this.xgridscale = i;
 
 		//do the same for the y-axis
-		for(i = 0.000000000001, c = 0; yrange/i > this.maxgridlines.y -1; c++) {
+		for(var i = 0.000000000001, c = 0; yrange / i > this.maxgridlines.y -1; c++) {
 			if(c % 3 == 1) i *= 2.5;
 			else i *= 2;
 
@@ -406,7 +327,8 @@ function JSgCalcParam (element){
 		this.ctx.font = "10pt 'Lucida Console'";	//set the font
 		this.ctx.textAlign = "center";
 
-		var xaxis = yaxis = null;
+		var xaxis = null;
+		var yaxis = null;
 
 		//currx is the current gridline being drawn, as a numerical value (not a pixel value)
 		var currx = this.arbFloor(x1, this.xgridscale);	//set it to before the lowest x-value on the screen
@@ -417,7 +339,7 @@ function JSgCalcParam (element){
 		curry = float_fix(curry);
 
 		if(y2 >= 0 && y1 <= 0)	//y=0 appears on the screen - move the text to follow
-			xmainaxis = this.height - ((0-y1)/(y2-y1))*this.height + (this.charHeight * 1.5);
+			xmainaxis = this.height - ((0 - y1) / (y2 - y1)) * this.height + (this.charHeight * 1.5);
 		else if(y1 > 0)	//the smallest value of y is below the screen - the x-axis labels get pushed to the bottom of the screen
 			xmainaxis = this.height - 5;
 
@@ -438,7 +360,7 @@ function JSgCalcParam (element){
 		var sigdigs = String(currx).length + 3;
 		//VERTICAL LINES
 		for(i = 0; i < this.maxgridlines.x; i++) {
-			xpos = ((currx-x1)/(x2-x1))*this.width;	//position of the line (in pixels)
+			var xpos = ((currx - x1) / (x2 - x1)) * this.width;	//position of the line (in pixels)
 			//make sure it is on the screen
 			if(xpos-0.5 > this.width + 1 || xpos < 0) {
 				currx += this.xgridscale;
@@ -476,9 +398,9 @@ function JSgCalcParam (element){
 
 		//HORIZONTAL LINES
 		for(i = 0; i < this.maxgridlines.y; i++) {
-			ypos = this.height - ((curry-y1)/(y2-y1))*this.height;	//position of the line (in pixels)
+			var ypos = this.height - ((curry - y1) / (y2 - y1)) * this.height;	//position of the line (in pixels)
 			//make sure it is on the screen
-			if(ypos-0.5 > this.height + 1 || ypos < 0) {
+			if(ypos - 0.5 > this.height + 1 || ypos < 0) {
 				curry += this.ygridscale;
 				continue;
 			}
@@ -518,8 +440,8 @@ function JSgCalcParam (element){
 
 	//get the pixel coordinates of a value
 	this.getCoord = function(x, y) {
-		var xpos = ((x-this.currCoord.x1)/(this.currCoord.x2-this.currCoord.x1))*this.width;
-		var ypos = this.height - ((y-this.currCoord.y1)/(this.currCoord.y2-this.currCoord.y1))*this.height;
+		var xpos = ((x - this.currCoord.x1) / (this.currCoord.x2 - this.currCoord.x1)) * this.width;
+		var ypos = this.height - ((y - this.currCoord.y1) / (this.currCoord.y2-this.currCoord.y1)) * this.height;
 		return {x : xpos, y : ypos};
 	};
 
@@ -566,13 +488,9 @@ function JSgCalcParam (element){
 		this.drawGrid();
 		var alleqs = getAllParametrics();
 		for(var i = 0; i < alleqs.length; i++) {
-			//try {
-			    var equation = alleqs[i].equation;
-			    this.drawEquation(equation, alleqs[i].color, 3);
-			    /*
-			} catch (e) {
-                console.warn('Error drawing equation');
-			}     */
+			var xeq = alleqs[i].x.equation;
+			var yeq = alleqs[i].y.equation;
+			this.drawSystem(xeq, yeq, alleqs[i].color, 3);
 		}
 		jsguip.updateValues();
 	};
@@ -602,13 +520,10 @@ function JSgCalcParam (element){
 				this.ctx.strokeRect (this.startDrag.x, this.startDrag.y, x-this.startDrag.x, y-this.startDrag.y);
 			}
 			else { //CLICK AND DRAG
-				//dump(scale.x + " " + scale.y + " -- " + this.startCoord.x1 + " " + this.startCoord.y1);
-				//dump(this.startCoord.x1 + " " +(y - this.startDrag.y) / scale.y);
 				this.currCoord.x1 = this.startCoord.x1 - ((x - this.startDrag.x) / scale.x);
 				this.currCoord.x2 = this.startCoord.x2 - ((x - this.startDrag.x) / scale.x);
 
 				this.currCoord.y1 = this.startCoord.y1 + ((y - this.startDrag.y) / scale.y);
-
 				this.currCoord.y2 = this.startCoord.y2 + ((y - this.startDrag.y) / scale.y);
 
 				this.draw();
@@ -616,23 +531,7 @@ function JSgCalcParam (element){
 		}
 		else if(jsguip.currtool === "trace") {	//TRACE
 			this.draw();
-			this.drawTrace(this.getEquation(jsguip.currEq), this.getColor(jsguip.currEq), x / scale.x + this.currCoord.x1);
-		}
-		else if(jsguip.currtool === "vertex") {
-			this.draw();
-			this.drawVertex(this.getEquation(jsguip.currEq), this.getColor(jsguip.currEq), x);
-		}
-		else if(jsguip.currtool === "root") {
-			this.draw();
-			this.drawRoot(this.getEquation(jsguip.currEq), this.getColor(jsguip.currEq), x);
-		}
-		else if(jsguip.currtool === "intersect") {
-			this.draw();
-			this.drawIntersect(this.getEquation(jsguip.currEq), this.getColor(jsguip.currEq), x);
-		}
-		else if(jsguip.currtool === "derivative") {
-			this.draw();
-			this.drawDerivative(this.getEquation(jsguip.currEq), this.getColor(jsguip.currEq), x);
+			this.drawTrace(this.getEquation(jsguip.currSys), this.getColor(jsguip.currSys), x / scale.x + this.currCoord.x1);
 		}
 		this.prevDrag = {x : x, y : y};
 	};
@@ -691,7 +590,7 @@ function JSgCalcParam (element){
 		if(event) {
 			var mousex = event.pageX - this.canvasX;
 			var mousey = event.pageY - this.canvasY;
-			var mousetop = 1-(mousey / this.height);	//if we divide the screen into two halves based on the position of the mouse, this is the top half
+			var mousetop = 1 - (mousey / this.height);	//if we divide the screen into two halves based on the position of the mouse, this is the top half
 			var mouseleft = mousex / this.width;	//as above, but the left hald
 			this.currCoord.x1 += range.x * scale * mouseleft;
 			this.currCoord.y1 += range.y * scale * mousetop;
@@ -733,10 +632,10 @@ function JSgCalcParam (element){
 		dump("Resized to " + width + "x" + height);
 
 		//Compute the new boundaries of the graph
-		this.currCoord.x1 *= (width/oldwidth);
-		this.currCoord.x2 *= (width/oldwidth);
-		this.currCoord.y1 *= (height/oldheight);
-		this.currCoord.y2 *= (height/oldheight);
+		this.currCoord.x1 *= (width / oldwidth);
+		this.currCoord.x2 *= (width / oldwidth);
+		this.currCoord.y1 *= (height / oldheight);
+		this.currCoord.y2 *= (height / oldheight);
 		this.startCoord = this.copyCoord(this.currCoord);
 
 		//Compute how many grid lines to show
@@ -761,7 +660,6 @@ function JSgCalcParam (element){
 			this.currCoord = {x1 : -5 * (this.width / this.height), y1 : -5, x2 : 5 * (this.width / this.height), y2 : 5};
 			this.startCoord = this.copyCoord(this.currCoord);
 			jsguip.evaluate();
-			//this.animate();
 
 			var self = this;
 			$("#graph").mousemove(function(event) {

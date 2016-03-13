@@ -97,6 +97,8 @@ function JSgCalc (element){
             var yval = f(xval);
 
 			var ypos = this.height - ((yval - y1) * scale.y);
+//			console.log("YPOS: " + ypos);
+
 			//The line is on the screen, or pretty close to it
 			if(ypos >= (this.height * -1) && ypos <= this.height * 2) {
 				if(lineExists > 1)

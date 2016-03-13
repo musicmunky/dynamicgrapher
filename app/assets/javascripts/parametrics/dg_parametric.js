@@ -122,6 +122,29 @@ jQuery( document ).ready(function() {
 });
 
 
+function setTValues(k)
+{
+	var key = k || "";
+	if(FUSION.lib.isBlank(key)) {
+		console.log("Key is blank - unable to update T-Values");
+		return false;
+	}
+	var ls = getItemByKey(key);
+	if(FUSION.get.objSize(ls) > 0)
+	{
+		var t = ls.t;
+		try {
+			FUSION.get.node("t_min").value = t.min;
+			FUSION.get.node("t_max").value = t.max;
+		}
+		catch(err) {
+			console.log("Error Setting Parameter info: " + err.toString());
+		}
+	}
+
+}
+
+
 function updateLsParam(p, v)
 {
 	var param = p || "";
@@ -131,8 +154,8 @@ function updateLsParam(p, v)
 		return false;
 	}
 
-	var ls = getItemByKey(jsguip.currEq);
-	if(!FUSION.lib.isBlank(jsguip.currEq) && FUSION.get.objSize(ls) > 0)
+	var ls = getItemByKey(jsguip.currSys);
+	if(!FUSION.lib.isBlank(jsguip.currSys) && FUSION.get.objSize(ls) > 0)
 	{
 		ls.params[param].value = v;
 		localStorage.setItem(ls.id, JSON.stringify(ls));
@@ -153,6 +176,41 @@ function updateDisplayParam(p, v)
 }
 
 
+function updateTvalMinMax()
+{
+	var min = FUSION.get.node("t_min");
+	var max = FUSION.get.node("t_max");
+	if(FUSION.lib.isBlank(min.value) || FUSION.lib.isBlank(max.value)) {
+		console.log("T-Min or T-Max is blank - Please put in a value for both of them");
+		return false;
+	}
+	try {
+		var i = parseFloat(min.value);
+		var a = parseFloat(max.value);
+		if(isNaN(i) || isNaN(a)) {
+			console.log("Undefined value for T-Min or T-Max: " + i + "   " + a);
+			return false;
+		}
+
+		var pfmin = parseFloat(min.value);
+		var pfmax = parseFloat(max.value);
+
+		var ls = getItemByKey(jsguip.currSys);
+		if(!FUSION.lib.isBlank(jsguip.currSys) && FUSION.get.objSize(ls) > 0)
+		{
+			ls.t.min = pfmin;
+			ls.t.max = pfmax;
+			localStorage.setItem(ls.id, JSON.stringify(ls));
+		}
+		jsguip.evaluate();
+	}
+	catch(err) {
+		console.log("Error updating T-Min / T-Max: " + err.toString());
+		return false;
+	}
+}
+
+
 function updateMinMax(p)
 {
 	var min = FUSION.get.node(p + "_min");
@@ -160,7 +218,7 @@ function updateMinMax(p)
 	var sld = FUSION.get.node(p + "_slider");
 
 	if(FUSION.lib.isBlank(min.value) || FUSION.lib.isBlank(max.value)) {
-		console.log("Min or Max is blank for Param: " + p + ".  Please put in a value for one or both of them");
+		console.log("Min or Max is blank for Param: " + p + ".  Please put in a value for both of them");
 		return false;
 	}
 
@@ -184,8 +242,8 @@ function updateMinMax(p)
 		var pfmax = parseFloat(max.value);
 		var pfval = parseFloat(newval);
 
-		var ls = getItemByKey(jsguip.currEq);
-		if(!FUSION.lib.isBlank(jsguip.currEq) && FUSION.get.objSize(ls) > 0)
+		var ls = getItemByKey(jsguip.currSys);
+		if(!FUSION.lib.isBlank(jsguip.currSys) && FUSION.get.objSize(ls) > 0)
 		{
 			ls.params[p].min = pfmin;
 			ls.params[p].max = pfmax;
@@ -238,7 +296,7 @@ function getAllParametrics()
 
 
 function updateFunctionColor() {
-	var ls = getItemByKey(jsguip.currEq);
+	var ls = getItemByKey(jsguip.currSys);
 	var div = FUSION.get.node("graph_color_indicator_" + ls.id);
 	ls.color = div.style.backgroundColor;
 	localStorage.setItem(ls.id, JSON.stringify(ls));

@@ -6,7 +6,7 @@
 	<%= javascript_include_tag "functions/jsgui" %>
 	<%= javascript_include_tag "functions/dg_function" %>
 
-	<%= render partial: "shared/toolbar" %>
+	<%= render partial: "shared/toolbar", locals: { page: 'function' } %>
 
 	<div id="sidewrapper">
 		<div id="graph_sidebar">

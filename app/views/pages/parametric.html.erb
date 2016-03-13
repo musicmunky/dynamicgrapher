@@ -6,12 +6,12 @@
 	<%= javascript_include_tag "parametrics/jsgui_parametric" %>
 	<%= javascript_include_tag "parametrics/dg_parametric" %>
 
-	<%= render partial: "shared/toolbar" %>
+	<%= render partial: "shared/toolbar", locals: { page: 'parametric' } %>
 
 	<div id="sidewrapper">
 		<div id="graph_sidebar">
 			<div id="buttonbar" style="margin-top:25px;">
-				<a class="fancybutton" href="javascript:void(0)" onclick="jsgui.evaluate()">Evaluate</a>
+				<a class="fancybutton" href="javascript:void(0)" onclick="jsguip.evaluate()">Evaluate</a>
 				<a class="fancybutton greybutton" href="javascript:void(0)" id="settings_button" onclick="$('#settings').toggle(400)">
 					<img src='assets/settings.png' alt='Settings' />
 				</a><br /><br />
@@ -19,22 +19,22 @@
 
 			<div id="settings">
 				<div id="angle_select" class="options_list">
-					<a href="javascript:void(0)" onclick="jsgui.setAngles('degrees')" id="angle_select_degrees" class="option">DEG</a>
-					<a href="javascript:void(0)" onclick="jsgui.setAngles('radians')" id="angle_select_radians" class="option option_selected">RAD</a>
-					<a href="javascript:void(0)" onclick="jsgui.setAngles('gradians')" id="angle_select_gradians" class="option">GRAD</a>
+					<a href="javascript:void(0)" onclick="jsguip.setAngles('degrees')" id="angle_select_degrees" class="option">DEG</a>
+					<a href="javascript:void(0)" onclick="jsguip.setAngles('radians')" id="angle_select_radians" class="option option_selected">RAD</a>
+					<a href="javascript:void(0)" onclick="jsguip.setAngles('gradians')" id="angle_select_gradians" class="option">GRAD</a>
 				</div>
 
 				<div id="gridlines_select" class="options_list">Gridlines:
-					<a href="javascript:void(0)" onclick="jsgui.setGridlines('normal')" id="gridlines_select_normal" class="option option_selected">NORMAL</a>
-					<a href="javascript:void(0)" onclick="jsgui.setGridlines('less')" id="gridlines_select_less" class="option">LESS</a>
-					<a href="javascript:void(0)" onclick="jsgui.setGridlines('off')" id="gridlines_select_off" class="option">OFF</a>
+					<a href="javascript:void(0)" onclick="jsguip.setGridlines('normal')" id="gridlines_select_normal" class="option option_selected">NORMAL</a>
+					<a href="javascript:void(0)" onclick="jsguip.setGridlines('less')" id="gridlines_select_less" class="option">LESS</a>
+					<a href="javascript:void(0)" onclick="jsguip.setGridlines('off')" id="gridlines_select_off" class="option">OFF</a>
 				</div>
 
 				<div id="quality_select" class="options_list">Precision:
-					<a href="javascript:void(0)" onclick="jsgui.setQuality(0.1)" id="quality_select_01" class="option">LOW</a>
-					<a href="javascript:void(0)" onclick="jsgui.setQuality(0.5)" id="quality_select_05" class="option">MED</a>
-					<a href="javascript:void(0)" onclick="jsgui.setQuality(1)" id="quality_select_1" class="option">HIGH</a>
-					<a href="javascript:void(0)" onclick="jsgui.setQuality(5)" id="quality_select_5" class="option option_selected">ULTRA</a>
+					<a href="javascript:void(0)" onclick="jsguip.setQuality(0.1)" id="quality_select_01" class="option">LOW</a>
+					<a href="javascript:void(0)" onclick="jsguip.setQuality(0.5)" id="quality_select_05" class="option">MED</a>
+					<a href="javascript:void(0)" onclick="jsguip.setQuality(1)" id="quality_select_1" class="option">HIGH</a>
+					<a href="javascript:void(0)" onclick="jsguip.setQuality(5)" id="quality_select_5" class="option option_selected">ULTRA</a>
 				</div>
 			</div>
 			<input type="hidden" value="" id="colorpickervalue" onchange="updateFunctionColor()" />
@@ -42,11 +42,11 @@
 			<div id="graph_parameters" style="height:200px;margin:5px;">
 				<span style="display:block;float:left;width:100%;font-size: 16px;height: 20px;margin-bottom: 20px;">T-Range:</span>
 				<div id="t_values" class="paramwrapperdiv" style="height:50px;border-bottom:1px solid #AAA;">
-					<input type="text" id="t_min" value="-10" class="minmax" onkeyup="updateTvalMinMax('t')" />
+					<input type="text" id="t_min" value="-10" class="minmax" onkeyup="updateTvalMinMax()" />
 					<span style="width:calc(100% - 100px);font-size:30px;display:inline-block;text-align:center;margin-top:-12px;">
 						&le;&nbsp;&nbsp;&nbsp;&nbsp; t &nbsp;&nbsp;&nbsp;&nbsp;&le;
 					</span>
-					<input type="text" id="t_max" value="10" class="minmax" onkeyup="updateTvalMinMax('t')" style="float:right;" />
+					<input type="text" id="t_max" value="10" class="minmax" onkeyup="updateTvalMinMax()" style="float:right;" />
 				</div>
 
 				<span style="display:block;float:left;width:100%;font-size: 16px;height: 20px;margin-bottom: 20px;margin-top:5px;">Parameters:</span>
