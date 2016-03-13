@@ -150,7 +150,7 @@ function updateLsParam(p, v)
 	var param = p || "";
 	var value = v || 0;
 	if(FUSION.lib.isBlank(param)) {
-		console.log("Param is blank - unable to update functions");
+		console.log("Param is blank - unable to update system");
 		return false;
 	}
 
@@ -168,7 +168,7 @@ function updateDisplayParam(p, v)
 	var param = p || "";
 	var value = v || 0;
 	if(FUSION.lib.isBlank(param)) {
-		console.log("Param is blank - unable to update functions");
+		console.log("Param is blank - unable to update system");
 		return false;
 	}
 	var spn = FUSION.get.node(param + "_val_span");

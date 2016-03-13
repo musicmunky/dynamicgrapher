@@ -226,9 +226,7 @@ function calcp() {
 
 	this.makeFunction = function (equation) {
 		var expr = math.parse(equation);
-//		console.log("EQ IS: " + equation);
 		var code = expr.compile();
-//		var code = expr.compile(math);
 		var variables = CalcParam.variablesInExpression(expr);
 
 		return function (x) {
@@ -242,7 +240,6 @@ function calcp() {
 				else { scope[name] = parseFloat(FUSION.get.node(name + "_val_span").innerHTML); }
 			});
 
-//			console.log(scope);
 			return code.eval(scope);
 		};
 	};

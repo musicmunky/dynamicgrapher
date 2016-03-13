@@ -63,29 +63,22 @@ function JSgCalcParam (element){
 		var y1 = this.currCoord.y1;
 		var y2 = this.currCoord.y2;
 
-		var xrange = x2 - x1;
-		var yrange = y2 - y1;
-
 		var scale = this.getScale();
-
-		if(!this.calccache[xeq])
-			this.calccache[xeq] = new Object;
-		if(!this.calccache[yeq])
-			this.calccache[yeq] = new Object;
 
 		this.ctx.strokeStyle = color;
 		var old_linewidth = this.ctx.linewidth
 		if(thickness)
 			this.ctx.linewidth = thickness;
 		this.ctx.beginPath();
+
 		//We don't want to draw lines that go off the screen too much, so we keep track of how many times we've had
 		//to go off the screen here
 		var lineExists = 0;
 		var lastpoint = 0;
 
+		//Loop through each pixel
 		this.fillareapath = [];
 		this.fillareapath.push([0, this.height - ((-y1) * scale.y)]);
-		//Loop through each pixel
 
 		var inverseQuality = 1.0 / this.quality;
 		var inverseScaleX = 1.0 / scale.x;
@@ -95,26 +88,17 @@ function JSgCalcParam (element){
 		var f = CalcParam.makeFunction(xeq);
 		var g = CalcParam.makeFunction(yeq);
 
-
 		var tmin = parseFloat(FUSION.get.node("t_min").value);
 		var tmax = parseFloat(FUSION.get.node("t_max").value);
 
 		var cntr = tmin;
-
-//		console.log("COUNTER START: " + cntr);
-//  		for(var i = 0; i < maxxval; i += inverseQuality) {
 		while(cntr < tmax) {
-
-//			var xval = cntr * inverseScaleX + x1;	//calculate the x-value for a given pixel
-//          var yval = f(xval);
 
 			var xval = f(cntr);
 			var yval = g(cntr);
-//			console.log("XVAL: " + xval + "   YVAL: " + yval);
 
-			var xpos = this.width - ((xval - x1) * scale.x);
+			var xpos = this.width - ((x2 - xval) * scale.x);
 			var ypos = this.height - ((yval - y1) * scale.y);
-//			console.log("XPOS: " + xpos + "    YPOS: " + ypos);
 
 			//The line is on the screen, or pretty close to it
 			if(ypos >= (this.height * -1) && ypos <= this.height * 2) {
@@ -141,35 +125,6 @@ function JSgCalcParam (element){
 			cntr += 0.01;
 		}
 
-		/*for(var i = 0; i < maxxval; i += inverseQuality) {
-			var xval = i * inverseScaleX + x1;	//calculate the x-value for a given pixel
-            var yval = f(xval);
-
-			var ypos = this.height - ((yval - y1) * scale.y);
-			//The line is on the screen, or pretty close to it
-			if(ypos >= (this.height * -1) && ypos <= this.height * 2) {
-				if(lineExists > 1)
-					this.ctx.beginPath();
-
-				if(lastpoint !== false && ((lastpoint > 0 && yval < 0) || (lastpoint < 0 && yval > 0))) {
-					this.ctx.moveTo(i, ypos);
-				}
-				else {
-					this.ctx.lineTo(i, ypos);
-				}
-
-				lineExists = 0;
-				lastpoint = false;
-			}
-			else if(lineExists <= 1) {	//The line is off the screen
-				this.ctx.lineTo(i, ypos);
-				lastpoint = yval;
-				this.ctx.stroke();
-				lineExists++;
-			}
-			this.fillareapath.push([i, ypos]);
-			//this.ctx.fillRect(i - 0.5, ypos - 0.5, 1, 1);
-		}*/
 		this.fillareapath.push([maxxval, this.height - ((-y1) * scale.y)]);
 		this.ctx.stroke();
 		this.ctx.linewidth = old_linewidth
