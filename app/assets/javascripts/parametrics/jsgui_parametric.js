@@ -125,7 +125,7 @@ function JSguiParam() {
 						localStorage.setItem(sid, JSON.stringify(syst));
 					}
 					catch(err) {
-						FUSION.error.logError(err, "Unable to create localStorage item: ");
+						FUSION.error.logError(err, "addParamSystem - Unable to create localStorage item: ");
 						return false;
 					}
 				}
@@ -137,7 +137,7 @@ function JSguiParam() {
 			this.refreshParamSystems();
 		}
 		catch(err) {
-			console.log("JSguiParam Error: " + err.message);
+			console.log("JSguiParam - Error in addParamSystem: " + err.message);
 			return false;
 		}
 	}

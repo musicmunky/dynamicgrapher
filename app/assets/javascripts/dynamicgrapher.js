@@ -23,7 +23,7 @@ function getItemByKey(i)
 				item = JSON.parse(lsstr);
 			}
 			catch(err) {
-				FUSION.error.logError(err);
+				FUSION.error.logError("Error in getItemByKey: " + err);
 			}
 		}
 		return item;
@@ -53,7 +53,7 @@ function setParamValues(k)
 				FUSION.get.node(pstr + "_val_span").innerHTML = prms[p].value;
 			}
 			catch(err) {
-				console.log("Error Setting Parameter info: " + err.toString());
+				console.log("Error in setParamValues: " + err.toString());
 			}
 		}
 	}

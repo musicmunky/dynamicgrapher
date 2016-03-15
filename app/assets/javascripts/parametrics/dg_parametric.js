@@ -8,7 +8,7 @@ jQuery( document ).ready(function() {
 			jsgcalcp.initCanvas();
 		}
 		catch(err) {
-			console.log("Initialization Error: " + err);
+			console.log("DG Parametric Initialization Error: " + err);
 		}
 
 		document.body.onselectstart = function () { return false; }
@@ -138,7 +138,7 @@ function setTValues(k)
 			FUSION.get.node("t_max").value = t.max;
 		}
 		catch(err) {
-			console.log("Error Setting Parameter info: " + err.toString());
+			console.log("Error in setTValues: " + err.toString());
 		}
 	}
 
@@ -205,7 +205,7 @@ function updateTvalMinMax()
 		jsguip.evaluate();
 	}
 	catch(err) {
-		console.log("Error updating T-Min / T-Max: " + err.toString());
+		console.log("Error in updateTvalMinMax: " + err.toString());
 		return false;
 	}
 }
@@ -255,7 +255,7 @@ function updateMinMax(p)
 		updateDisplayParam(p, pfval);
 	}
 	catch(err) {
-		console.log("Error updating Min/Max: " + err.toString());
+		console.log("Error in Parametric updateMinMax: " + err.toString());
 		return false;
 	}
 }
@@ -287,7 +287,7 @@ function getAllParametrics()
 			}
 			catch(err)
 			{
-				FUSION.error.logError(err);
+				FUSION.error.logError("Error in getAllParametrics: " + err);
 			}
 		}
 	}

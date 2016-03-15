@@ -1,4 +1,4 @@
-function JSgCalcParam (element){
+function JSgCalcParam(element) {
 	try {
 		this.graph = document.getElementById(element);
 		this.graphElement = $("#" + element);
@@ -19,7 +19,7 @@ function JSgCalcParam (element){
 		this.fillareapath;
 	}
 	catch(err) {
-		console.log("JSgCalcParam Error: " + err.message);
+		console.log("JSgCalcParam Initialization Error: " + err.message);
 		return false;
 	}
 
@@ -608,8 +608,6 @@ function JSgCalcParam (element){
 	this.initCanvas = function() {
 		if (this.graph.getContext){
 			this.ctx = this.graph.getContext('2d');
-// 			this.ctx.height = 953;
-// 			$("#graph_wrapper").width( $("#graph_wrapper").width() - $("#sidewrapper").innerWidth() - $("#toolbar").innerWidth() );
 			$("#graph_wrapper").width( $( window ).width() - $("#sidewrapper").innerWidth() - $("#toolbar").innerWidth() );
 			this.resizeGraph($("#graph_wrapper").innerWidth(), $("#graph_wrapper").height());
 			this.currCoord = {x1 : -5 * (this.width / this.height), y1 : -5, x2 : 5 * (this.width / this.height), y2 : 5};
