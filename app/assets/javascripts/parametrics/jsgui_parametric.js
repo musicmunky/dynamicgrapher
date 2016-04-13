@@ -105,6 +105,7 @@ function JSguiParam() {
 
 	this.addParamSystem = function(h) {
 		var syst = h || {};
+		var nsid = "";
  		try {
 			if(!("x" in syst) || !("y" in syst)) //completely new system
 			{
@@ -119,10 +120,11 @@ function JSguiParam() {
 						color: newcolor,
 						id: sid,
 						t: { min:-10, max:10 },
-						params: { a: { min:-10, max:10, value: 0 }, b: { min:-10, max:10, value: 0 }, c: { min:-10, max:10, value: 0 } }
+						params: { a: { min:-10, max:10, step: 1, value: 0 }, b: { min:-10, max:10, step: 1, value: 0 }, c: { min:-10, max:10, step: 1, value: 0 } }
 					};
 					try {
 						localStorage.setItem(sid, JSON.stringify(syst));
+						nsid = sid;
 					}
 					catch(err) {
 						FUSION.error.logError(err, "addParamSystem - Unable to create localStorage item: ");
@@ -135,6 +137,7 @@ function JSguiParam() {
 				}
 			}
 			this.refreshParamSystems();
+			return nsid;
 		}
 		catch(err) {
 			console.log("JSguiParam - Error in addParamSystem: " + err.message);

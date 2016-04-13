@@ -43,29 +43,38 @@
 			<div id="graph_parameters" style="height:200px;margin:5px;">
 				<span style="display:block;float:left;width:100%;font-size: 16px;height: 20px;margin-bottom: 20px;">Parameters:</span>
 				<div id="a_param" class="paramwrapperdiv">
-					<div class="paramdiv">a = <span id="a_val_span">1</span></div>
-					<input type="text" id="a_min" value="0" class="minmax" onkeyup="updateMinMax('a')" />
-					<div class="slidediv">
-<!--						<input id="a_slider" type="range" min="20" max="66" step="1" value="22" />//-->
-						<input id="a_slider" type="range" min="-10" max="10" value="1" />
+					<div class="paramdiv">
+						<div style="float:right;">Step: <input id="a_step" class="stepsize" type="text" value="1" onkeyup="updateStep('a')" /></div>
+						<div style="float:left;">a = <span id="a_val_span">1</span></div>
 					</div>
-					<input type="text" id="a_max" value="100" class="minmax" onkeyup="updateMinMax('a')" />
+					<input type="text" id="a_min" value="-10" class="minmax" onkeyup="updateMinMax('a')" />
+					<div class="slidediv">
+<!--					<input id="a_slider" type="range" min="20" max="66" step="1" value="22" />//-->
+						<input id="a_slider" type="range" min="" max="" value="" />
+					</div>
+					<input type="text" id="a_max" value="10" class="minmax" onkeyup="updateMinMax('a')" />
 				</div>
 				<div id="b_param" class="paramwrapperdiv">
-					<div class="paramdiv">b = <span id="b_val_span">0</span></div>
-					<input type="text" id="b_min" value="0" class="minmax" onkeyup="updateMinMax('b')" />
-					<div class="slidediv">
-						<input id="b_slider" type="range" min="-10" max="10" value="0" />
+					<div class="paramdiv">
+						<div style="float:right;">Step: <input id="b_step" class="stepsize" type="text" value="1" onkeyup="updateStep('b')" /></div>
+						<div style="float:left;">b = <span id="b_val_span">0</span></div>
 					</div>
-					<input type="text" id="b_max" value="100" class="minmax" onkeyup="updateMinMax('b')" />
+					<input type="text" id="b_min" value="-10" class="minmax" onkeyup="updateMinMax('b')" />
+					<div class="slidediv">
+						<input id="b_slider" type="range" min="" max="" value="" />
+					</div>
+					<input type="text" id="b_max" value="10" class="minmax" onkeyup="updateMinMax('b')" />
 				</div>
 				<div id="c_param" class="paramwrapperdiv">
-					<div class="paramdiv">c = <span id="c_val_span">0</span></div>
-					<input type="text" id="c_min" value="0" class="minmax" onkeyup="updateMinMax('c')" />
-					<div class="slidediv">
-						<input id="c_slider" type="range" min="-10" max="10" value="0" />
+					<div class="paramdiv">
+						<div style="float:right;">Step: <input id="c_step" class="stepsize" type="text" value="1" onkeyup="updateStep('c')" /></div>
+						<div style="float:left;">c = <span id="c_val_span">0</span></div>
 					</div>
-					<input type="text" id="c_max" value="100" class="minmax" onkeyup="updateMinMax('c')" />
+					<input type="text" id="c_min" value="-10" class="minmax" onkeyup="updateMinMax('c')" />
+					<div class="slidediv">
+						<input id="c_slider" type="range" min="" max="" value="" />
+					</div>
+					<input type="text" id="c_max" value="10" class="minmax" onkeyup="updateMinMax('c')" />
 				</div>
 			</div>
 		</div>

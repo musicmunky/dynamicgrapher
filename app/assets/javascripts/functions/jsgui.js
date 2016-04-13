@@ -115,7 +115,7 @@ function JSgui() {
 						equation: "",
 						color: newcolor,
 						id: fid,
-						params: { a:{ min:-10, max:10, value: 0 }, b:{ min:-10, max:10, value: 0 }, c:{ min:-10, max:10, value: 0 } }
+						params: { a:{ min:-10, max:10, step: 1, value: 0 }, b:{ min:-10, max:10, step: 1, value: 0 }, c:{ min:-10, max:10, step: 1, value: 0 } }
 					};
 					try {
 						localStorage.setItem(fid, JSON.stringify(func));

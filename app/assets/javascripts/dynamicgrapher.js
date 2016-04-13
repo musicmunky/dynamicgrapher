@@ -7,6 +7,7 @@ jQuery( document ).ready(function() {
 	}
 });
 
+
 function getItemByKey(i)
 {
 	var id = i || "";
@@ -27,6 +28,23 @@ function getItemByKey(i)
 			}
 		}
 		return item;
+	}
+}
+
+
+function setInitialParamValues(p)
+{
+	var parms = p || {};
+	try {
+		FUSION.get.node("a_val_span").innerHTML = parms.a.value;
+		FUSION.get.node("b_val_span").innerHTML = parms.b.value;
+		FUSION.get.node("c_val_span").innerHTML = parms.c.value;
+		FUSION.get.node("a_step").value = parms.a.step;
+		FUSION.get.node("b_step").value = parms.b.step;
+		FUSION.get.node("c_step").value = parms.c.step;
+	}
+	catch(err) {
+		console.log("Error initializing function parameters: " + err.toString());
 	}
 }
 

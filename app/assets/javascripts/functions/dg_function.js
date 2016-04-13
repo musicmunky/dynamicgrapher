@@ -2,118 +2,135 @@ jQuery( document ).ready(function() {
 
 	if(FUSION.lib.supportsHtml5Storage())
 	{
-		try {
-			jsgui = new JSgui;
-			jsgcalc = new JSgCalc("graph");
-			jsgcalc.initCanvas();
-		}
-		catch(err) {
-			console.log("Initialization Error: " + err);
-		}
+		var path = window.location.pathname.replace("/", "");
+		if(path == "function") {
+			try {
+				jsgui = new JSgui;
+				jsgcalc = new JSgCalc("graph");
+				jsgcalc.initCanvas();
+			}
+			catch(err) {
+				console.log("Initialization Error: " + err);
+			}
 
-		document.body.onselectstart = function () { return false; }
+			document.body.onselectstart = function () { return false; }
 
-		var allfncs = getAllFunctions();
-		if(allfncs.length > 0)
-		{
-			jsgui.selectEquation(allfncs[0].id);
- 			for(var j = 0; j < allfncs.length; j++)
+			var initparams = {};
+			var allfncs = getAllFunctions();
+			if(allfncs.length > 0)
 			{
-				jsgui.addInput(allfncs[j]);
+				initparams = getItemByKey(allfncs[0].id);
+				setInitialParamValues(initparams.params);
+				jsgui.selectEquation(allfncs[0].id);
+				for(var j = 0; j < allfncs.length; j++)
+				{
+					jsgui.addInput(allfncs[j]);
+				}
 			}
+			else
+			{
+				var eq = jsgui.addInput();
+				initparams = getItemByKey(eq);
+				setInitialParamValues(initparams.params);
+				jsgui.selectEquation(eq);
+			}
+
+			$(".toolbox_close a").click(function() {
+				$(".toolbox").hide();
+			})
+
+			$(".graph_equation_display").keyup(function(event){
+				if(event.keyCode == 13){
+					jsgui.evaluate();
+				}
+			});
+
+			// Initialize a new plugin instance for element or array of elements.
+			var aslider = FUSION.get.node("a_slider");
+			rangeSlider.create(aslider, {
+				polyfill: true,     // Boolean, if true, custom markup will be created
+				rangeClass: 'rangeSlider',
+				fillClass: 'rangeSlider__fill',
+				handleClass: 'rangeSlider__handle',
+				startEvent: ['mousedown', 'touchstart', 'pointerdown'],
+				moveEvent: ['mousemove', 'touchmove', 'pointermove'],
+				endEvent: ['mouseup', 'touchend', 'pointerup'],
+				min: initparams.params.a.min,		// Number , 0
+				max: initparams.params.a.max,		// Number, 100
+				value: initparams.params.a.value,
+				step: initparams.params.a.step,		// Number, 1
+				borderRadius: 2,    // Number, if you use buffer + border-radius in css for looks good,
+				onInit: function () {
+					var as = FUSION.get.node("a_slider");
+					FUSION.get.node("a_min").value = initparams.params.a.min; //as.min;
+					FUSION.get.node("a_max").value = initparams.params.a.max; //as.max;
+				},
+				onSlideStart: function (value, percent, position) {},
+				onSlide: function (value, percent, position) {
+					updateDisplayParam("a", value);
+					jsgui.evaluate();
+				},
+				onSlideEnd: function (value, percent, position) {
+					updateLsParam("a", value);
+				}
+			});
+
+			var bslider = FUSION.get.node("b_slider");
+			rangeSlider.create(bslider, {
+				polyfill: true,
+				rangeClass: 'rangeSlider',
+				fillClass: 'rangeSlider__fill',
+				handleClass: 'rangeSlider__handle',
+				startEvent: ['mousedown', 'touchstart', 'pointerdown'],
+				moveEvent: ['mousemove', 'touchmove', 'pointermove'],
+				endEvent: ['mouseup', 'touchend', 'pointerup'],
+				min: initparams.params.b.min,		// Number , 0
+				max: initparams.params.b.max,		// Number, 100
+				value: initparams.params.b.value,
+				step: initparams.params.b.step, 	// Number, 1
+				borderRadius: 10,
+				onInit: function () {
+					var bs = FUSION.get.node("b_slider");
+					FUSION.get.node("b_min").value = initparams.params.b.min; //bs.min;
+					FUSION.get.node("b_max").value = initparams.params.b.max; //bs.max;
+				},
+				onSlide: function (value, percent, position) {
+					updateDisplayParam("b", value);
+					jsgui.evaluate();
+				},
+				onSlideEnd: function (value, percent, position) {
+					updateLsParam("b", value);
+				}
+			});
+
+			var cslider = FUSION.get.node("c_slider");
+			rangeSlider.create(cslider, {
+				polyfill: true,
+				rangeClass: 'rangeSlider',
+				fillClass: 'rangeSlider__fill',
+				handleClass: 'rangeSlider__handle',
+				startEvent: ['mousedown', 'touchstart', 'pointerdown'],
+				moveEvent: ['mousemove', 'touchmove', 'pointermove'],
+				endEvent: ['mouseup', 'touchend', 'pointerup'],
+				min: initparams.params.c.min,		// Number , 0
+				max: initparams.params.c.max,		// Number, 100
+				value: initparams.params.c.value,
+				step: initparams.params.c.step, 	// Number, 1
+				borderRadius: 10,
+				onInit: function () {
+					var cs = FUSION.get.node("c_slider");
+					FUSION.get.node("c_min").value = initparams.params.c.min; //cs.min;
+					FUSION.get.node("c_max").value = initparams.params.c.max; //cs.max;
+				},
+				onSlide: function (value, percent, position) {
+					updateDisplayParam("c", value);
+					jsgui.evaluate();
+				},
+				onSlideEnd: function (value, percent, position) {
+					updateLsParam("c", value);
+				}
+			});
 		}
-		else
-		{
-			var eq = jsgui.addInput();
-			jsgui.selectEquation(eq);
-		}
-
-		$(".toolbox_close a").click(function() {
-			$(".toolbox").hide();
-		})
-
-		$(".graph_equation_display").keyup(function(event){
-			if(event.keyCode == 13){
-				jsgui.evaluate();
-			}
-		});
-
-		// Initialize a new plugin instance for element or array of elements.
-		var aslider = FUSION.get.node("a_slider");
-		rangeSlider.create(aslider, {
-			polyfill: true,     // Boolean, if true, custom markup will be created
-			rangeClass: 'rangeSlider',
-			fillClass: 'rangeSlider__fill',
-			handleClass: 'rangeSlider__handle',
-			startEvent: ['mousedown', 'touchstart', 'pointerdown'],
-			moveEvent: ['mousemove', 'touchmove', 'pointermove'],
-			endEvent: ['mouseup', 'touchend', 'pointerup'],
-			borderRadius: 10,    // Number, if you use buffer + border-radius in css for looks good,
-			onInit: function () {
-				var s = FUSION.get.node("a_slider");
-				FUSION.get.node("a_min").value = s.min;
-				FUSION.get.node("a_max").value = s.max;
-				FUSION.get.node("a_val_span").innerHTML = s.value;
-			},
-			onSlideStart: function (value, percent, position) {},
-			onSlide: function (value, percent, position) {
-				updateDisplayParam("a", value);
-				jsgui.evaluate();
-			},
-			onSlideEnd: function (value, percent, position) {
-				updateLsParam("a", value);
-			}
-		});
-
-		var bslider = FUSION.get.node("b_slider");
-		rangeSlider.create(bslider, {
-			polyfill: true,
-			rangeClass: 'rangeSlider',
-			fillClass: 'rangeSlider__fill',
-			handleClass: 'rangeSlider__handle',
-			startEvent: ['mousedown', 'touchstart', 'pointerdown'],
-			moveEvent: ['mousemove', 'touchmove', 'pointermove'],
-			endEvent: ['mouseup', 'touchend', 'pointerup'],
-			borderRadius: 10,
-			onInit: function () {
-				var s = FUSION.get.node("b_slider");
-				FUSION.get.node("b_min").value = s.min;
-				FUSION.get.node("b_max").value = s.max;
-				FUSION.get.node("b_val_span").innerHTML = s.value;
-			},
-			onSlide: function (value, percent, position) {
-				updateDisplayParam("b", value);
-				jsgui.evaluate();
-			},
-			onSlideEnd: function (value, percent, position) {
-				updateLsParam("b", value);
-			}
-		});
-
-		var cslider = FUSION.get.node("c_slider");
-		rangeSlider.create(cslider, {
-			polyfill: true,
-			rangeClass: 'rangeSlider',
-			fillClass: 'rangeSlider__fill',
-			handleClass: 'rangeSlider__handle',
-			startEvent: ['mousedown', 'touchstart', 'pointerdown'],
-			moveEvent: ['mousemove', 'touchmove', 'pointermove'],
-			endEvent: ['mouseup', 'touchend', 'pointerup'],
-			borderRadius: 10,
-			onInit: function () {
-				var s = FUSION.get.node("c_slider");
-				FUSION.get.node("c_min").value = s.min;
-				FUSION.get.node("c_max").value = s.max;
-				FUSION.get.node("c_val_span").innerHTML = s.value;
-			},
-			onSlide: function (value, percent, position) {
-				updateDisplayParam("c", value);
-				jsgui.evaluate();
-			},
-			onSlideEnd: function (value, percent, position) {
-				updateLsParam("c", value);
-			}
-		});
 	}
 	else
 	{
@@ -152,6 +169,39 @@ function updateDisplayParam(p, v)
 	}
 	var spn = FUSION.get.node(param + "_val_span");
 	spn.innerHTML = value;
+}
+
+
+function updateStep(p)
+{
+	var stp = FUSION.get.node(p + "_step");
+	var sld = FUSION.get.node(p + "_slider");
+
+	if(FUSION.lib.isBlank(stp.value)) {
+		console.log("Step size is blank for Param: " + p  + ".  Please make sure it has a value!");
+		return false;
+	}
+	try {
+		var s = parseFloat(stp.value);
+		if(isNaN(s)) {
+			console.log("Undefined value for Step size: " + s);
+			return false;
+		}
+
+		var ls = getItemByKey(jsgui.currEq);
+		if(!FUSION.lib.isBlank(jsgui.currEq) && FUSION.get.objSize(ls) > 0)
+		{
+			ls.params[p].step = s;
+			localStorage.setItem(ls.id, JSON.stringify(ls));
+		}
+
+		sld.rangeSlider.update({step: s});
+
+	}
+	catch(err) {
+		console.log("Error updating Step size: " + err.toString());
+		return false;
+	}
 }
 
 
