@@ -68,7 +68,7 @@ function JSgui() {
 		$("#sidewrapper").show();
 		$("#hideSidebar").show();
 		$("#showSidebar").hide();
-		$("#toolbar").css("right", "282px");
+		$("#toolbar").css("right", "301px");
 		jsgcalc.resizeGraph($("#wrapper").width() - $("#sidewrapper").width() - widthPlusPadding("#toolbar"), $("#wrapper").height());
 		this.setTool(this.currtool);
 	}
@@ -115,7 +115,7 @@ function JSgui() {
 						equation: "",
 						color: newcolor,
 						id: fid,
-						params: { a:{ min:-10, max:10, step: 1, value: 0 }, b:{ min:-10, max:10, step: 1, value: 0 }, c:{ min:-10, max:10, step: 1, value: 0 } }
+						params: { a:{ min:-10, max:10, step: 1, value: 1 }, b:{ min:-10, max:10, step: 1, value: 1 }, c:{ min:-10, max:10, step: 1, value: 1 } }
 					};
 					try {
 						localStorage.setItem(fid, JSON.stringify(func));

@@ -8,6 +8,36 @@ jQuery( document ).ready(function() {
 });
 
 
+function clearLsCache(t)
+{
+	var type = t || "";
+	if(FUSION.lib.isBlank(type)) {
+		console.log("unable to clear cache - no type specified");
+		return false;
+	}
+
+	var lsitems = [];
+	var fncname = "";
+	switch (type) {
+		case "function":
+			lsitems = getAllFunctions();
+			for(var i = 0; i < lsitems.length; i++) {
+				jsgui.removeInput(lsitems[i].id);
+			}
+			break;
+		case "parametric":
+			lsitems = getAllParametrics();
+			for(var i = 0; i < lsitems.length; i++) {
+				jsguip.removeSystem(lsitems[i].id)
+			}
+			break;
+		default:
+			console.log("Unable to clear cache - invalid type");
+			return false;
+	}
+}
+
+
 function getItemByKey(i)
 {
 	var id = i || "";
@@ -15,20 +45,19 @@ function getItemByKey(i)
 		console.log("ID is blank, could not return function");
 		return false;
 	}
-	else {
-		var item	= {};
-		var lsstr	= localStorage.getItem(id);
-		if(lsstr !== null)
-		{
-			try {
-				item = JSON.parse(lsstr);
-			}
-			catch(err) {
-				FUSION.error.logError("Error in getItemByKey: " + err);
-			}
+
+	var item	= {};
+	var lsstr	= localStorage.getItem(id);
+	if(lsstr !== null)
+	{
+		try {
+			item = JSON.parse(lsstr);
 		}
-		return item;
+		catch(err) {
+			FUSION.error.logError("Error in getItemByKey: " + err);
+		}
 	}
+	return item;
 }
 
 

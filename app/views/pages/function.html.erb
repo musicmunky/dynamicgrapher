@@ -1,4 +1,4 @@
-<%- view_title "Standard Functions" %>
+<% view_title "Standard Functions" %>
 <% content_for :grapher do %>
 
 	<%= javascript_include_tag "functions/calc" %>
@@ -13,6 +13,7 @@
 			<div id="buttonbar" style="margin-top:25px;">
 				<a class="fancybutton" href="javascript:void(0)" onclick="jsgui.evaluate()">Evaluate</a>
 				<a class="fancybutton" href="javascript:void(0)" onclick="jsgui.addInput()">+</a>
+				<a class="fancybutton" href="javascript:void(0)" onclick="clearLsCache('function')">Clear Cache</a>
 				<a class="fancybutton greybutton" href="javascript:void(0)" id="settings_button" onclick="$('#settings').toggle(400)">
 					<img src='assets/settings.png' alt='Settings' />
 				</a><br /><br />
@@ -49,7 +50,6 @@
 					</div>
 					<input type="text" id="a_min" value="-10" class="minmax" onkeyup="updateMinMax('a')" />
 					<div class="slidediv">
-<!--					<input id="a_slider" type="range" min="20" max="66" step="1" value="22" />//-->
 						<input id="a_slider" type="range" min="" max="" value="" />
 					</div>
 					<input type="text" id="a_max" value="10" class="minmax" onkeyup="updateMinMax('a')" />

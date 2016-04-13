@@ -93,11 +93,11 @@ function JSgCalc (element){
 		var f = Calc.makeFunction(equation);
 
 		for(var i = 0; i < maxxval; i += inverseQuality) {
+
 			var xval = i * inverseScaleX + x1;	//calculate the x-value for a given pixel
             var yval = f(xval);
 
 			var ypos = this.height - ((yval - y1) * scale.y);
-//			console.log("XVAL IS: " + );
 
 			//The line is on the screen, or pretty close to it
 			if(ypos >= (this.height * -1) && ypos <= this.height * 2) {

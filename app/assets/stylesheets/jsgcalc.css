@@ -5,19 +5,19 @@ body { font-family: "Open Sans", sans-serif; font-size: 9pt;}
 
 #wrapper { position: absolute; top: 0px; left: 0px; height: calc(100% - 60px); width: 100%;overflow: hidden;}
 
-#toolbar { width: 47px; padding: 35px 5px 0px 5px; height: 100%; background: #EDEDED; border-left: 1px solid #BBB; position: absolute; z-index: 10; right: 282px; top: 0;}
+#toolbar { width: 47px; padding: 35px 5px 0px 5px; height: 100%; background: #EDEDED; border-left: 1px solid #BBB; position: absolute; z-index: 10; right: 301px; top: 0;}
 #tool_select img { border: 1px solid transparent; opacity: 0.5; border-radius: 5px; }
 #tool_select img:hover { opacity: 1.0;}
 #tool_select a.toolbar_selected img { border: 1px solid #CCC; opacity: 1.0 !important; background: #FFF; 
 	-webkit-box-shadow: inset 0px -900px 50px -900px rgba(150, 150, 150, 0.3), inset 0px 1px 0px 0px #FFF;
 	box-shadow: inset 0px -900px 40px -900px rgba(150, 150, 150, 0.3), inset 0px 1px 0px 0px #FFF;}
 
-#sidewrapper { position: absolute; top: 1px; right: 1px; width: 280px; z-index: 5; background: #F6F6F6; border-left: 1px solid #BBB; height: 100%; overflow: auto;}
+#sidewrapper { position: absolute; top: 1px; right: 1px; width: 300px; z-index: 5; background: #F6F6F6; border-left: 1px solid #BBB; height: 100%; overflow: auto;}
 #graph_sidebar { margin: 5px 10px;}
 #hideSidebar, #showSidebar { z-index: 11; font-size: 15pt; font-weight: bold; border-bottom: 1px solid #999; width: 46px;
 	background: #F7F7F7; position: absolute; top: -1px;}
 #showSidebar { display: none; right: 0px; }
-#hideSidebar { right: 282px; display: inline;}
+#hideSidebar { right: 301px; display: inline;}
 #showSidebar a, #hideSidebar a { color: #666; text-decoration: none; display: block; padding-top: 0px; text-align: right; padding-right: 13px;}
 #showSidebar a {text-align: left; padding-left: 13px;}
 

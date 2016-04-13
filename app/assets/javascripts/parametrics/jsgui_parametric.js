@@ -120,7 +120,7 @@ function JSguiParam() {
 						color: newcolor,
 						id: sid,
 						t: { min:-10, max:10 },
-						params: { a: { min:-10, max:10, step: 1, value: 0 }, b: { min:-10, max:10, step: 1, value: 0 }, c: { min:-10, max:10, step: 1, value: 0 } }
+						params: { a: { min:-10, max:10, step: 1, value: 1 }, b: { min:-10, max:10, step: 1, value: 1 }, c: { min:-10, max:10, step: 1, value: 1 } }
 					};
 					try {
 						localStorage.setItem(sid, JSON.stringify(syst));
@@ -172,7 +172,7 @@ function JSguiParam() {
 			if(!FUSION.get.node("graph_system_wrapper_" + systems[i].id)) {
 				var giw = FUSION.lib.createHtmlElement({"type":"div", "attributes":{"id":"graph_system_wrapper_" + systems[i].id, "class":"graph_system_wrapper"},
 													    "style":{"float":"left", "width":"100%"}});
-				var rem = FUSION.lib.createHtmlElement({"type":"button", "onclick":"jsguip.removeInput('" + systems[i].id + "')",
+				var rem = FUSION.lib.createHtmlElement({"type":"button", "onclick":"jsguip.removeSystem('" + systems[i].id + "')",
 														"style":{"margin-top":"13px"},
 														"attributes":{"id":"graph_equation_remover_" + systems[i].id, "class":"glyphicon glyphicon-trash graph_equation_remover"}});
 
