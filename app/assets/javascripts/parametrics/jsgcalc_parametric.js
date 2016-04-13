@@ -92,6 +92,11 @@ function JSgCalcParam(element) {
 		var tmax = parseFloat(FUSION.get.node("t_max").value);
 
 		var cntr = tmin;
+		var incr = 0.01;
+		var step = FUSION.get.node("t_step");
+		if((!isNaN(parseFloat(step.value)) || !FUSION.lib.isBlank(step.value)) && parseFloat(step.value) > 0) {
+			incr = parseFloat(step.value);
+		}
 		while(cntr < tmax) {
 
 			var xval = f(cntr);
@@ -122,7 +127,7 @@ function JSgCalcParam(element) {
 				lineExists++;
 			}
 			this.fillareapath.push([xpos, ypos]);
-			cntr += 0.01;
+			cntr += incr;
 		}
 
 		this.fillareapath.push([maxxval, this.height - ((-y1) * scale.y)]);

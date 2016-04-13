@@ -141,6 +141,30 @@ jQuery( document ).ready(function() {
 });
 
 
+function updateTStep()
+{
+	var stp = FUSION.get.node("t_step");
+	if(FUSION.lib.isBlank(stp.value)) {
+		console.log("Step size is blank for Param: t.  Please make sure it has a value!");
+		return false;
+	}
+	try {
+		var s = parseFloat(stp.value);
+		if(isNaN(s)) {
+			console.log("Undefined value for Step size: " + s);
+			return false;
+		}
+		jsguip.evaluate();
+	}
+	catch(err) {
+		console.log("Error updating Step size: " + err.toString());
+		return false;
+	}
+
+
+}
+
+
 function setTValues(k)
 {
 	var key = k || "";
