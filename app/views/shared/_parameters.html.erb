@@ -1,0 +1,60 @@
+<span style="display:block;float:left;width:100%;font-size: 16px;height: 20px;margin-bottom: 20px;margin-top:5px;">Parameters:</span>
+<div id="a_param" class="paramwrapperdiv">
+	<div class="paramdiv">
+		<div style="float:left;">
+			<button type="button" id="playbtn_a" class="btn btn-success btn-xs" style="min-width:0px !important;margin-right:5px;display:inline-block;">
+				<span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+			</button>
+			<button type="button" id="stopbtn_a" class="btn btn-danger btn-xs" style="min-width: 0px !important;margin-right: 5px;display:none;">
+				<span class="glyphicon glyphicon-stop" aria-hidden="true"></span>
+			</button>
+			a = <span id="a_val_span" class="pval_span">1</span>
+		</div>
+		<div style="float:right;">
+			Step: <input id="a_step" class="stepsize" type="text" value="1" onkeyup="updateStep('a')" />
+		</div>
+	</div>
+	<input type="text" id="a_min" value="0" class="minmax" onkeyup="updateMinMax('a')" />
+	<div class="slidediv">
+		<input id="a_slider" type="range" min="-10" max="10" value="1" />
+	</div>
+	<input type="text" id="a_max" value="100" class="minmax" onkeyup="updateMinMax('a')" />
+</div>
+<div id="b_param" class="paramwrapperdiv">
+	<div class="paramdiv">
+		<div style="float:left;">
+			<button type="button" id="playbtn_b" class="btn btn-success btn-xs" style="min-width:0px !important;margin-right:5px;display:inline-block;">
+				<span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+			</button>
+			<button type="button" id="stopbtn_b" class="btn btn-danger btn-xs" style="min-width: 0px !important;margin-right: 5px;display:none;">
+				<span class="glyphicon glyphicon-stop" aria-hidden="true"></span>
+			</button>
+			b = <span id="b_val_span" class="pval_span">0</span>
+		</div>
+		<div style="float:right;">Step: <input id="b_step" class="stepsize" type="text" value="1" onkeyup="updateStep('b')" /></div>
+	</div>
+	<input type="text" id="b_min" value="0" class="minmax" onkeyup="updateMinMax('b')" />
+	<div class="slidediv">
+		<input id="b_slider" type="range" min="-10" max="10" value="0" />
+	</div>
+	<input type="text" id="b_max" value="100" class="minmax" onkeyup="updateMinMax('b')" />
+</div>
+<div id="c_param" class="paramwrapperdiv">
+	<div class="paramdiv">
+		<div style="float:left;">
+			<button type="button" id="playbtn_c" class="btn btn-success btn-xs" style="min-width:0px !important;margin-right:5px;display:inline-block;">
+				<span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+			</button>
+			<button type="button" id="stopbtn_c" class="btn btn-danger btn-xs" style="min-width: 0px !important;margin-right: 5px;display:none;">
+				<span class="glyphicon glyphicon-stop" aria-hidden="true"></span>
+			</button>
+			c = <span id="c_val_span" class="pval_span">0</span>
+		</div>
+		<div style="float:right;">Step: <input id="c_step" class="stepsize" type="text" value="1" onkeyup="updateStep('c')" /></div>
+	</div>
+	<input type="text" id="c_min" value="0" class="minmax" onkeyup="updateMinMax('c')" />
+	<div class="slidediv">
+		<input id="c_slider" type="range" min="-10" max="10" value="0" />
+	</div>
+	<input type="text" id="c_max" value="100" class="minmax" onkeyup="updateMinMax('c')" />
+</div>

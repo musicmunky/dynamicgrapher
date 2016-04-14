@@ -15,6 +15,13 @@ jQuery( document ).ready(function() {
 
 			document.body.onselectstart = function () { return false; }
 
+			$( "#playbtn_a" ).click(function() { playSystemParam('a') });
+			$( "#stopbtn_a" ).click(function() { stopSystemParam('a') });
+			$( "#playbtn_b" ).click(function() { playSystemParam('b') });
+			$( "#stopbtn_b" ).click(function() { stopSystemParam('b') });
+			$( "#playbtn_c" ).click(function() { playSystemParam('c') });
+			$( "#stopbtn_c" ).click(function() { stopSystemParam('c') });
+
 			var initparams = {};
 			var allparms = getAllParametrics();
 			if(allparms.length > 0)
@@ -140,7 +147,7 @@ jQuery( document ).ready(function() {
 
 });
 
-var play_timer;
+var sys_play_timer;
 function playSystemParam(p)
 {
 	var param = p || "";
@@ -163,7 +170,7 @@ function playSystemParam(p)
 
 	playbtn.style.display = "none";
 	stopbtn.style.display = "inline-block";
-	play_timer = setInterval( function() { runSlider(param); }, 100 );
+	sys_play_timer = setInterval( function() { runSlider(param); }, 100 );
 }
 
 
@@ -198,7 +205,7 @@ function stopSystemParam(p)
 		return false;
 	}
 
-	clearInterval(play_timer);
+	clearInterval(sys_play_timer);
 
 	var sys = jsguip.currSys;
 	var playbtn = FUSION.get.node("playbtn_" + param);
@@ -213,7 +220,6 @@ function stopSystemParam(p)
 		FUSION.get.node("stopbtn_" + SYSTEM_PARAMS[i]).disabled = false;
 	}
 }
-
 
 
 function updateTStep()
