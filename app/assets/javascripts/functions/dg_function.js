@@ -15,11 +15,14 @@ jQuery( document ).ready(function() {
 
 			document.body.onselectstart = function () { return false; }
 
-			$( "#playbtn_a" ).click(function() { playFunctionParam('a')	});
+			$( "#rwndbtn_a" ).click(function() { playFunctionParam('a', -1)	});
+			$( "#playbtn_a" ).click(function() { playFunctionParam('a', 1) });
 			$( "#stopbtn_a" ).click(function() { stopFunctionParam('a')	});
-			$( "#playbtn_b" ).click(function() { playFunctionParam('b')	});
+			$( "#rwndbtn_b" ).click(function() { playFunctionParam('b', -1)	});
+			$( "#playbtn_b" ).click(function() { playFunctionParam('b', 1) });
 			$( "#stopbtn_b" ).click(function() { stopFunctionParam('b') });
-			$( "#playbtn_c" ).click(function() { playFunctionParam('c') });
+			$( "#rwndbtn_c" ).click(function() { playFunctionParam('c', -1)	});
+			$( "#playbtn_c" ).click(function() { playFunctionParam('c', 1) });
 			$( "#stopbtn_c" ).click(function() { stopFunctionParam('c') });
 
 			var initparams = {};
@@ -149,29 +152,23 @@ jQuery( document ).ready(function() {
 
 
 var fnc_play_timer;
-function playFunctionParam(p)
+function playFunctionParam(p, d)
 {
 	var param = p || "";
+	var drctn = d;
 	if(FUSION.lib.isBlank(param)) {
 		console.log("Param is blank - unable to update function");
 		return false;
 	}
 
 	try {
-		var playbtn = FUSION.get.node("playbtn_" + param);
-		var stopbtn = FUSION.get.node("stopbtn_" + param);
-
 		for(var i = 0; i < FUNCTION_PARAMS.length; i++)
 		{
-			if(FUNCTION_PARAMS[i] !== param) {
-				FUSION.get.node("playbtn_" + FUNCTION_PARAMS[i]).disabled = true;
-				FUSION.get.node("stopbtn_" + FUNCTION_PARAMS[i]).disabled = true;
-			}
+			FUSION.get.node("rwndbtn_" + FUNCTION_PARAMS[i]).disabled = true;
+			FUSION.get.node("playbtn_" + FUNCTION_PARAMS[i]).disabled = true;
+			FUSION.get.node("stopbtn_" + FUNCTION_PARAMS[i]).disabled = (FUNCTION_PARAMS[i] == param) ? false : true;
 		}
-
-		playbtn.style.display = "none";
-		stopbtn.style.display = "inline-block";
-		fnc_play_timer = setInterval( function() { runSlider(param); }, 100 );
+		fnc_play_timer = setInterval( function() { runSlider(param, drctn); }, 100 );
 	}
 	catch(err) {
 		console.log("Error initializing playback for function parameter: " + err.toString());
@@ -180,20 +177,24 @@ function playFunctionParam(p)
 }
 
 
-function runSlider(p)
+function runSlider(p, d)
 {
 	var param = p || "";
+	var drctn = d;
 	if(FUSION.lib.isBlank(param)) {
 		console.log("Param is blank - unable to update function");
 		return false;
 	}
 	try {
 		var sld = FUSION.get.node(param + "_slider");
-		var sval = sld.rangeSlider.value;
-		var incr = parseFloat(FUSION.get.node(param + "_step").value);
-		var nval = sval + incr;
 		var pmax = parseFloat(FUSION.get.node(param + "_max").value);
-		if(nval <= pmax) {
+		var pmin = parseFloat(FUSION.get.node(param + "_min").value);
+		var incr = parseFloat(FUSION.get.node(param + "_step").value);
+
+		var sval = sld.rangeSlider.value;
+		var nval = sval + (incr * drctn);
+
+		if((drctn == 1 && nval <= pmax) || (drctn == -1 && nval >= pmin)) {
 			sld.rangeSlider.update({value: nval});
 			updateDisplayParam(param, nval);
 			jsgui.evaluate();
@@ -219,14 +220,9 @@ function stopFunctionParam(p)
 
 	clearInterval(fnc_play_timer);
 
-	var playbtn = FUSION.get.node("playbtn_" + param);
-	var stopbtn = FUSION.get.node("stopbtn_" + param);
-
-	playbtn.style.display = "inline-block";
-	stopbtn.style.display = "none";
-
 	for(var i = 0; i < FUNCTION_PARAMS.length; i++)
 	{
+		FUSION.get.node("rwndbtn_" + FUNCTION_PARAMS[i]).disabled = false;
 		FUSION.get.node("playbtn_" + FUNCTION_PARAMS[i]).disabled = false;
 		FUSION.get.node("stopbtn_" + FUNCTION_PARAMS[i]).disabled = false;
 	}
