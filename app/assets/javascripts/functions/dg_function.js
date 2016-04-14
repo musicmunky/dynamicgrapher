@@ -157,20 +157,26 @@ function playFunctionParam(p)
 		return false;
 	}
 
-	var playbtn = FUSION.get.node("playbtn_" + param);
-	var stopbtn = FUSION.get.node("stopbtn_" + param);
+	try {
+		var playbtn = FUSION.get.node("playbtn_" + param);
+		var stopbtn = FUSION.get.node("stopbtn_" + param);
 
-	for(var i = 0; i < FUNCTION_PARAMS.length; i++)
-	{
-		if(FUNCTION_PARAMS[i] !== param) {
-			FUSION.get.node("playbtn_" + FUNCTION_PARAMS[i]).disabled = true;
-			FUSION.get.node("stopbtn_" + FUNCTION_PARAMS[i]).disabled = true;
+		for(var i = 0; i < FUNCTION_PARAMS.length; i++)
+		{
+			if(FUNCTION_PARAMS[i] !== param) {
+				FUSION.get.node("playbtn_" + FUNCTION_PARAMS[i]).disabled = true;
+				FUSION.get.node("stopbtn_" + FUNCTION_PARAMS[i]).disabled = true;
+			}
 		}
-	}
 
-	playbtn.style.display = "none";
-	stopbtn.style.display = "inline-block";
-	fnc_play_timer = setInterval( function() { runSlider(param); }, 100 );
+		playbtn.style.display = "none";
+		stopbtn.style.display = "inline-block";
+		fnc_play_timer = setInterval( function() { runSlider(param); }, 100 );
+	}
+	catch(err) {
+		console.log("Error initializing playback for function parameter: " + err.toString());
+		return false;
+	}
 }
 
 
@@ -181,18 +187,24 @@ function runSlider(p)
 		console.log("Param is blank - unable to update function");
 		return false;
 	}
-	var sld = FUSION.get.node(param + "_slider");
-	var sval = sld.rangeSlider.value;
-	var incr = parseFloat(FUSION.get.node(param + "_step").value);
-	var nval = sval + incr;
-	var pmax = parseFloat(FUSION.get.node(param + "_max").value);
-	if(nval <= pmax) {
-		sld.rangeSlider.update({value: nval});
-		updateDisplayParam(param, nval);
-		jsgui.evaluate();
+	try {
+		var sld = FUSION.get.node(param + "_slider");
+		var sval = sld.rangeSlider.value;
+		var incr = parseFloat(FUSION.get.node(param + "_step").value);
+		var nval = sval + incr;
+		var pmax = parseFloat(FUSION.get.node(param + "_max").value);
+		if(nval <= pmax) {
+			sld.rangeSlider.update({value: nval});
+			updateDisplayParam(param, nval);
+			jsgui.evaluate();
+		}
+		else {
+			stopFunctionParam(param);
+		}
 	}
-	else {
-		stopFunctionParam(param);
+	catch(err) {
+		console.log("Error running function parameter: " + err.toString());
+		return false;
 	}
 }
 

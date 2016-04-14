@@ -156,21 +156,27 @@ function playSystemParam(p)
 		return false;
 	}
 
-	var sys = jsguip.currSys;
-	var playbtn = FUSION.get.node("playbtn_" + param);
-	var stopbtn = FUSION.get.node("stopbtn_" + param);
+	try {
+		var sys = jsguip.currSys;
+		var playbtn = FUSION.get.node("playbtn_" + param);
+		var stopbtn = FUSION.get.node("stopbtn_" + param);
 
-	for(var i = 0; i < SYSTEM_PARAMS.length; i++)
-	{
-		if(SYSTEM_PARAMS[i] !== param) {
-			FUSION.get.node("playbtn_" + SYSTEM_PARAMS[i]).disabled = true;
-			FUSION.get.node("stopbtn_" + SYSTEM_PARAMS[i]).disabled = true;
+		for(var i = 0; i < SYSTEM_PARAMS.length; i++)
+		{
+			if(SYSTEM_PARAMS[i] !== param) {
+				FUSION.get.node("playbtn_" + SYSTEM_PARAMS[i]).disabled = true;
+				FUSION.get.node("stopbtn_" + SYSTEM_PARAMS[i]).disabled = true;
+			}
 		}
-	}
 
-	playbtn.style.display = "none";
-	stopbtn.style.display = "inline-block";
-	sys_play_timer = setInterval( function() { runSlider(param); }, 100 );
+		playbtn.style.display = "none";
+		stopbtn.style.display = "inline-block";
+		sys_play_timer = setInterval( function() { runSlider(param); }, 100 );
+	}
+	catch(err) {
+		console.log("Error initializing playback for system parameter: " + err.toString());
+		return false;
+	}
 }
 
 
@@ -181,18 +187,25 @@ function runSlider(p)
 		console.log("Param is blank - unable to update system");
 		return false;
 	}
-	var sld = FUSION.get.node(param + "_slider");
-	var sval = sld.rangeSlider.value;
-	var incr = parseFloat(FUSION.get.node(param + "_step").value);
-	var nval = sval + incr;
-	var pmax = parseFloat(FUSION.get.node(param + "_max").value);
-	if(nval <= pmax) {
-		sld.rangeSlider.update({value: nval});
-		updateDisplayParam(param, nval);
-		jsguip.evaluate();
+
+	try {
+		var sld = FUSION.get.node(param + "_slider");
+		var sval = sld.rangeSlider.value;
+		var incr = parseFloat(FUSION.get.node(param + "_step").value);
+		var nval = sval + incr;
+		var pmax = parseFloat(FUSION.get.node(param + "_max").value);
+		if(nval <= pmax) {
+			sld.rangeSlider.update({value: nval});
+			updateDisplayParam(param, nval);
+			jsguip.evaluate();
+		}
+		else {
+			stopSystemParam(param);
+		}
 	}
-	else {
-		stopSystemParam(param);
+	catch(err) {
+		console.log("Error running system parameter: " + err.toString());
+		return false;
 	}
 }
 
