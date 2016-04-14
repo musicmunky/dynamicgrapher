@@ -140,6 +140,81 @@ jQuery( document ).ready(function() {
 
 });
 
+var play_timer;
+function playSystemParam(p)
+{
+	var param = p || "";
+	if(FUSION.lib.isBlank(param)) {
+		console.log("Param is blank - unable to update system");
+		return false;
+	}
+
+	var sys = jsguip.currSys;
+	var playbtn = FUSION.get.node("playbtn_" + param);
+	var stopbtn = FUSION.get.node("stopbtn_" + param);
+
+	for(var i = 0; i < SYSTEM_PARAMS.length; i++)
+	{
+		if(SYSTEM_PARAMS[i] !== param) {
+			FUSION.get.node("playbtn_" + SYSTEM_PARAMS[i]).disabled = true;
+			FUSION.get.node("stopbtn_" + SYSTEM_PARAMS[i]).disabled = true;
+		}
+	}
+
+	playbtn.style.display = "none";
+	stopbtn.style.display = "inline-block";
+	play_timer = setInterval( function() { runSlider(param); }, 100 );
+}
+
+
+function runSlider(p)
+{
+	var param = p || "";
+	if(FUSION.lib.isBlank(param)) {
+		console.log("Param is blank - unable to update system");
+		return false;
+	}
+	var sld = FUSION.get.node(param + "_slider");
+	var sval = sld.rangeSlider.value;
+	var incr = parseFloat(FUSION.get.node(param + "_step").value);
+	var nval = sval + incr;
+	var pmax = parseFloat(FUSION.get.node(param + "_max").value);
+	if(nval <= pmax) {
+		sld.rangeSlider.update({value: nval});
+		updateDisplayParam(param, nval);
+		jsguip.evaluate();
+	}
+	else {
+		stopSystemParam(param);
+	}
+}
+
+
+function stopSystemParam(p)
+{
+	var param = p || "";
+	if(FUSION.lib.isBlank(param)) {
+		console.log("Param is blank - unable to update system");
+		return false;
+	}
+
+	clearInterval(play_timer);
+
+	var sys = jsguip.currSys;
+	var playbtn = FUSION.get.node("playbtn_" + param);
+	var stopbtn = FUSION.get.node("stopbtn_" + param);
+
+	playbtn.style.display = "inline-block";
+	stopbtn.style.display = "none";
+
+	for(var i = 0; i < SYSTEM_PARAMS.length; i++)
+	{
+		FUSION.get.node("playbtn_" + SYSTEM_PARAMS[i]).disabled = false;
+		FUSION.get.node("stopbtn_" + SYSTEM_PARAMS[i]).disabled = false;
+	}
+}
+
+
 
 function updateTStep()
 {

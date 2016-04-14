@@ -1,3 +1,6 @@
+FUNCTION_PARAMS = ["a", "b", "c"];
+SYSTEM_PARAMS = ["a", "b", "c"];
+
 jQuery( document ).ready(function() {
 	//IE doesn't like Google fonts...load Web Safe font for IE users
 	var gbr = FUSION.get.browser();
