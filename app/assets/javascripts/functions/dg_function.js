@@ -197,6 +197,7 @@ function runSlider(p, d)
 		if((drctn == 1 && nval <= pmax) || (drctn == -1 && nval >= pmin)) {
 			sld.rangeSlider.update({value: nval});
 			updateDisplayParam(param, nval);
+// 			updateLsParam(param, nval);
 			jsgui.evaluate();
 		}
 		else {

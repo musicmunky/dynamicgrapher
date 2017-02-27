@@ -150,6 +150,7 @@ jQuery( document ).ready(function() {
 
 });
 
+
 var sys_play_timer;
 function playSystemParam(p, d)
 {
@@ -197,6 +198,7 @@ function runSlider(p, d)
 		if((drctn == 1 && nval <= pmax) || (drctn == -1 && nval >= pmin)) {
 			sld.rangeSlider.update({value: nval});
 			updateDisplayParam(param, nval);
+// 			updateLsParam(param, nval);
 			jsguip.evaluate();
 		}
 		else {
@@ -248,8 +250,6 @@ function updateTStep()
 		console.log("Error updating Step size: " + err.toString());
 		return false;
 	}
-
-
 }
 
 
