@@ -9,6 +9,7 @@
 
 //create the FUSION object
 var FUSION = FUSION || {};
+var $F = FUSION;
 
 var loadjq = window.jQuery ? true : false;
 if(!loadjq){
@@ -16,18 +17,44 @@ if(!loadjq){
 }
 
 Array.prototype.clean = function(deleteValue) {
-	for (var i = 0; i < this.length; i++) {
-		if (this[i] == deleteValue) {
-			this.splice(i, 1);
-			i--;
+	/**
+	 * Example uses for array.clean:
+	 * var clean_array = new Array("","One","Two","", "Three","","Four").clean("");
+	 *	=> returns ["One", "Two", "Three", "Four"]
+	 * var dirty_array = [1,2,,3,,3,,null,undefined,"",,4,,4,,5,,6,,,,];
+	 * dirty_array.clean([undefined,null,""]);
+	 *	=> returns [1,2,3,3,4,4,5,6]
+	 */
+	try {
+		var del_array = [];
+		if(deleteValue === null || typeof deleteValue !== "object") {
+			if(deleteValue === undefined || typeof deleteValue === "undefined") {
+				del_array.push(undefined);
+			}
+			else if(deleteValue === null || typeof deleteValue === "null") {
+				del_array.push(null);
+			}
+			else {
+				del_array.push(deleteValue);
+			}
 		}
+		else {
+			del_array = deleteValue;
+		}
+		for(var j = 0; j < del_array.length; j++) {
+			for (var i = 0; i < this.length; i++) {
+				if (this[i] === del_array[j]) {
+					this.splice(i, 1);
+					i--;
+				}
+			}
+		}
+	}
+	catch(err) {
+		console.error("Error cleaning array: " + err.message);
 	}
 	return this;
 };
-
-//test = new Array("","One","Two","", "Three","","Four").clean("");
-//test2 = [1,2,,3,,3,,,,,,4,,4,,5,,6,,,,];
-//test2.clean(undefined);
 
 
 //Getter methods
@@ -144,18 +171,13 @@ FUSION.get = {
 	//don't really have a "size" per se
 	objSize: function(obj) {
 		try {
-			var hasNonLeafNodes = false;
 			var childCount = 0;
-
 			for(var child in obj)
 			{
-				if(typeof obj[child] === 'object')
-				{
+				if(typeof obj[child] === 'object') {
 					childCount += FUSION.get.objSize(obj[child]);
-					hasNonLeafNodes = true;
 				}
-				else
-				{
+				else {
 					childCount++;
 				}
 			}
@@ -163,16 +185,28 @@ FUSION.get = {
 		}
 		catch(err) {
 			FUSION.error.logError(err);
-			return 0;
+			return -1;
 		}
 	},
 
 	//returns the value of a URL parameter by name
-	urlParamByName: function(name) {
-		var rgx = new RexExp(name + "=" + "(.+?)(&|$)");
-		return decodeURI(
-			(rgx.exec(location.search)||[,null])[1]
-		);
+	urlParamByName: function(name, url) {
+		try {
+			var location = url || window.location;
+			var rgx = new RegExp(name + "=" + "(.+?)(&|$)");
+			var res = (rgx.exec(location)||[,null])[1]
+
+			if(res !== null && typeof res !== undefined) {
+				return decodeURI(res);
+			}
+			else {
+				return null;
+			}
+		}
+		catch(err) {
+			FUSION.error.logError(err);
+			return null;
+		}
 	},
 
 	//returns all of the parameters in a url in a JSON object (hash table)
@@ -192,6 +226,7 @@ FUSION.get = {
 			return phash;
 		}
 		catch(err) {
+			FUSION.error.logError(err);
 			phash['is_error'] = true;
 			phash['error'] = err;
 			return phash;
@@ -240,12 +275,6 @@ FUSION.get = {
 		}
 		return matchingElements;
 	},
-
-	randomHexColor: function() {
-		var rhc = Math.floor(Math.random()*16777215).toString(16);
-		rhc = rhc.length == 6 ? "#" + rhc : "#0" + rhc;
-		return rhc;
-	},
 };
 
 
@@ -254,12 +283,28 @@ FUSION.set = {
 
 	//Set the mouse cursor to the "waiting" icon
 	overlayMouseWait: function() {
-		jQuery("body").addClass("wait");
+		var bd = document.body;
+		var cn = bd.className;
+
+		//body has no class applied
+		if(FUSION.lib.isBlank(cn)) {
+			bd.className = "wait";
+		}
+		else {
+			//body has existing css classes, don't apply
+			//the 'wait' class more than once
+			var cn_arry = cn.split(" ");
+			var cn_indx = cn_arry.indexOf("wait");
+			if(cn_indx == -1) {
+				bd.className += " wait";
+			}
+		}
 	},
 
 	//Set the mouse cursor back to the "default" icon
 	overlayMouseNormal: function() {
-		jQuery("body").removeClass("wait");
+		//remove the 'wait' class from the body
+		document.body.className = document.body.className.replace(/(?:^|\s)wait(?!\S)/, "");
 	},
 
 	//set the selected text of a select box / dropdown list
@@ -330,13 +375,15 @@ FUSION.remove = {
 	node: function(el) {
 		try {
 			var elm = FUSION.get.node(el);
-			var par = elm.parentNode;
-			par.removeChild(elm);
+			if(elm !== null) {
+				var par = elm.parentNode;
+				par.removeChild(elm);
+			}
 			return true;
 		}
 		catch(err) {
 			FUSION.error.logError(err);
-			FUSION.error.showError(err);
+			return false;
 		}
 	},
 };
@@ -417,14 +464,25 @@ FUSION.error = {
 //BEGIN LIBRARY GENERIC METHODS
 FUSION.lib = {
 
+	//add commas to a number
+	addCommas: function(num) {
+		try {
+			return (num + "").replace(/\b(\d+)((\.\d+)*)\b/g, function(aMatches, grp1, grp2) {
+				return (grp1.charAt(0) > 0 && !(grp2 || ".").lastIndexOf(".") ? grp1.replace(/(\d)(?=(\d{3})+$)/g, "$1,") : grp1) + grp2;
+			});
+		}
+		catch(err) {
+			FUSION.error.logError(err);
+			return num;
+		}
+	},
+
 	//focus the cursor on a specific DOM element, usually an input field or a select box
 	focus: function(el) {
 		try {
 			//need to declare f here to avoid null reference errors
 			var f = FUSION;
-			setTimeout(function() {
-				f.get.node(el).focus()
-			}, 10);
+			setTimeout(function() {f.get.node(el).focus()}, 10);
 		}
 		catch(err) {
 			FUSION.error.logError(err);
@@ -439,19 +497,6 @@ FUSION.lib = {
 		catch(err) {
 			FUSION.error.logError(err);
 			return "";
-		}
-	},
-
-	//generic function to check if the browser can handle
-	//and use localStorage, or if they're living in the stone age
-	supportsHtml5Storage: function()
-	{
-		try {
-			return 'localStorage' in window && window['localStorage'] !== null;
-		}
-		catch(err) {
-			FUSION.error.logError(err);
-			return false;
 		}
 	},
 
@@ -707,11 +752,11 @@ FUSION.lib = {
 	//it accounts for white space, so "   " would be considered a blank string
 	isBlank: function(t) {
 		try {
-			var ts = t.toString();
-			return ts.match(/^\s*$/);
+			if(t === undefined || t === null) { return true; }
+			return /^\s*$/.test(t);
 		}
 		catch(err) {
-			FUSION.error.logError(err);
+			FUSION.error.logError(err, "Error determining if string is blank: ");
 			return true;
 		}
 	},
@@ -740,7 +785,7 @@ FUSION.lib = {
 
 	//check if a year is a leap year or not
 	isLeapYear: function(year) {
-		var y = parseInt(year) || new Date().getFullYear();
+		var y = parseInt(year);
 		return ((y % 4 == 0) && (y % 100 != 0)) || (y % 400 == 0);
 	},
 
@@ -791,8 +836,8 @@ FUSION.lib = {
 				for (var key in attrs)
 				{
 					attrname = key;
-					if(key.match(/^class/i)){
-						attrname = (br.browser.match(/ie/i) && parseInt(br.version) < 9) ? "className" : "class";
+					if(/^class/i.test(key)) {
+						attrname = (/ie/i.test(br.browser) && parseInt(br.version) < 9) ? "className" : "class";
 					}
 					el.setAttribute(attrname, attrs[key]);
 				}
@@ -806,7 +851,7 @@ FUSION.lib = {
 				for (var key in styls)
 				{
 					stylename = key;
-					if(key.match(/^float/)){
+					if(/^float/.test(key)){
 						stylename = "cssFloat";
 					}
 					stylearry = styls[key].split(" ");
@@ -854,25 +899,6 @@ FUSION.lib = {
 			FUSION.error.showError(err, "There was an error creating the desired element: ");
 			return document.createElement("div");
 		}
-	},
-
-	//may end up removing this - it assumes too much regarding server configuration
-	//it was a good idea, but will probably be scrapped
-	sendErrorEmail: function(id) {
-		var uid = id;
-		var msg = FUSION.get.node("errormessage").value;
-		var fst = FUSION.get.node("fullstacktrace").value;
-		hideGeneralError();
-		var info = {
-			"type": "POST",
-			"path": "URLtoEmailFunctionality",
-			"data": {
-				user_id: uid,
-				message: msg,
-				trace: fst
-			}
-		};
-		FUSION.lib.ajaxCall(info);
 	},
 
 	//prevents a users from typing anything but numer characters in a text field
@@ -1134,4 +1160,81 @@ FUSION.lib = {
 			return ( (A < B) ? -1 : ((A > B) ? 1 : 0) ) * [-1,1][+!!reverse];
 		}
 	},
+
+	validUrl: function(url) {
+		try {
+			return rgx_url.test(url);
+		}
+		catch(err) {
+			FUSION.error.logError(err, "Error trying to parse URL: ");
+			return false;
+		}
+	},
 };
+//
+// Regular Expression for URL validation
+//
+// Author: Diego Perini
+// Updated: 2010/12/05
+// License: MIT
+//
+// Copyright (c) 2010-2013 Diego Perini (http://www.iport.it)
+//
+// Permission is hereby granted, free of charge, to any person
+// obtaining a copy of this software and associated documentation
+// files (the "Software"), to deal in the Software without
+// restriction, including without limitation the rights to use,
+// copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the
+// Software is furnished to do so, subject to the following
+// conditions:
+//
+// The above copyright notice and this permission notice shall be
+// included in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+// OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+// HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+// WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+// OTHER DEALINGS IN THE SOFTWARE.
+//
+
+var rgx_url = new RegExp(
+  "^" +
+    // protocol identifier
+    "(?:(?:https?|ftp)://)" +
+    // user:pass authentication
+    "(?:\\S+(?::\\S*)?@)?" +
+    "(?:" +
+      // IP address exclusion
+      // private & local networks
+      "(?!(?:10|127)(?:\\.\\d{1,3}){3})" +
+      "(?!(?:169\\.254|192\\.168)(?:\\.\\d{1,3}){2})" +
+      "(?!172\\.(?:1[6-9]|2\\d|3[0-1])(?:\\.\\d{1,3}){2})" +
+      // IP address dotted notation octets
+      // excludes loopback network 0.0.0.0
+      // excludes reserved space >= 224.0.0.0
+      // excludes network & broacast addresses
+      // (first & last IP address of each class)
+      "(?:[1-9]\\d?|1\\d\\d|2[01]\\d|22[0-3])" +
+      "(?:\\.(?:1?\\d{1,2}|2[0-4]\\d|25[0-5])){2}" +
+      "(?:\\.(?:[1-9]\\d?|1\\d\\d|2[0-4]\\d|25[0-4]))" +
+    "|" +
+      // host name
+      "(?:(?:[a-z\\u00a1-\\uffff0-9]-*)*[a-z\\u00a1-\\uffff0-9]+)" +
+      // domain name
+      "(?:\\.(?:[a-z\\u00a1-\\uffff0-9]-*)*[a-z\\u00a1-\\uffff0-9]+)*" +
+      // TLD identifier
+      "(?:\\.(?:[a-z\\u00a1-\\uffff]{2,}))" +
+      // TLD may end with dot
+      "\\.?" +
+    ")" +
+    // port number
+    "(?::\\d{2,5})?" +
+    // resource path
+    "(?:[/?#]\\S*)?" +
+  "$", "i"
+);
